@@ -1,2 +1,2 @@
-# C-Console-App-Game
+# CSharp-Console-App-Game
 C# Game
