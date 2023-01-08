@@ -9,16 +9,15 @@ namespace CSharpConsoleAppGame
 
 	internal class Animation
 	{
-		public event EventHandler Animate;
+		public static event EventHandler<Task> AnimatePlaying;
 
 		public void BlinkImage(IAnimatable animatableObject, int blinkCount)
 		{
 			Task task = Task.Run(() => { Blink(animatableObject, blinkCount); });
 			task.Wait();
-			if (Animate != null)
-			{
-				Animate(task, EventArgs.Empty);
-			}
+			
+			AnimatePlaying?.Invoke(this, task);
+			
 			//while (!task.IsCompleted)
 			{
 				//BlockUserInput();
@@ -39,8 +38,10 @@ namespace CSharpConsoleAppGame
 			for (int i = 0; i < blinkCount; i++)
 			{
 				Screen.PlaceOnScreen(animatableObject, blinkImage);
+				Screen.RenderScreen(null);
 				Task.Delay(50).Wait();
 				Screen.PlaceOnScreen(animatableObject);
+				Screen.RenderScreen(null);
 				Task.Delay(50).Wait();
 			}
 

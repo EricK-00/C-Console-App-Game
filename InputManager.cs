@@ -8,18 +8,19 @@ namespace CSharpConsoleAppGame
 {
 	internal class InputManager
 	{
-		Animation animation = new Animation();
-
 		public InputManager()
 		{
-			//animation.Animate += new EventHandler(BlockUserInput);
+			Animation.AnimatePlaying += BlockUserInput;
 		}
 
-		public static void BlockUserInput(string message)
+		public static void BlockUserInput(object sender, Task task)
 		{
-			if (Console.KeyAvailable)
+			while (!task.IsCompleted)
 			{
-				Console.ReadKey(true);
+				if (Console.KeyAvailable)
+				{
+					Console.ReadKey(true);
+				}
 			}
 		}
 	}

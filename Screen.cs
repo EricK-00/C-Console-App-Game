@@ -9,7 +9,8 @@ namespace CSharpConsoleAppGame
 		const int screenSizeY = 25;
 		public static string[,] screen = new string[screenSizeY, screenSizeX];
 
-		public Screen()
+		//public Screen()
+		public static void Initialize()
 		{
 			for (int i = 0; i < screenSizeY; i++)
 			{
@@ -27,7 +28,7 @@ namespace CSharpConsoleAppGame
 			{
 				for (int j = 0; j < screenSizeX; j++)
 				{
-					Console.Write(screen[i, j]);
+					Console.Write($"{screen[i, j].PadRight(2)}");
 				}
 				Console.WriteLine();
 			}

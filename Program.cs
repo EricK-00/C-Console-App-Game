@@ -5,7 +5,7 @@
 		static void Main(string[] args)
 		{
 			Console.CursorVisible = false;
-			Timer timer = new Timer(Screen.RenderScreen, null, 0, 50);
+			//Timer timer = new Timer(Screen.RenderScreen, null, 0, 50);
 
 			List<string> strings = new List<string>();
 			int row, col;
@@ -40,13 +40,22 @@
 				Console.WriteLine($"str C{strings.Count}");
 			}
 
+			Screen.Initialize();
+			Screen.RenderScreen(null);
+
 			Window selectionWindow = new Window(2, 2, 10, 10);
 			Window viewWindow = new Window(10, 1, 20, 10);
 			//Screen.PlaceOnScreen(selectionWindow);
 			Screen.PlaceOnScreen(viewWindow);
-			
+			Console.ReadLine();
+			Screen.RenderScreen(null);
+
+			Console.ReadLine();
+
+			Animation animation = new Animation();
+			animation.BlinkImage(viewWindow, 5);
+
 			//Screen.RenderScreen(null);
-			Animation.BlinkImage(viewWindow, 5);
 
 			Console.ReadLine();
 		}
