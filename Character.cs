@@ -8,30 +8,43 @@ namespace CSharpConsoleAppGame
 {
 	public enum Type
 	{
-
+		불꽃 = 0,
+		물,
+		풀
 	}
 
-	internal class Character : IAnimatable
+	public struct CharacterStats
 	{
-		int maxHp;
-		int attack;
-		int defense;
-		int specialAttack;
-		int specialDefense;
-		int speed;
+		public CharacterStats(int hp_, int attack_, int defense_, int speed_)
+		{
+			Hp = hp_;
+			Attack = attack_;
+			Defense = defense_;
+			Speed = speed_;
+		}
 
-		int currentHp;
+		public int Hp { get; set; }
+		public int Attack { get; }
+		public int Defense { get; }
+		//public int SpecialAttack { get; }
+		//public int SpecialDefense { get; }
+		public int Speed { get; }
+	}
 
-		//string bringObject;
+	internal class Character
+	{
+		public string Name { get; }
+		public CharacterStats Stats { get; }
+
+		//string heldItem;
 		//string feature;
 		Skill[] skills = new Skill[4];
 		Type characterType;
 
-		public int X { get; protected set; }
-		public int Y { get; protected set; }
-
-		public int Width { get; protected set; }
-		public int Height { get; protected set; }
-		public string[,] Image { get; set; }
+		public Character(string name, CharacterStats stats)
+		{
+			Name = name;
+			Stats = stats;
+		}
 	}
 }

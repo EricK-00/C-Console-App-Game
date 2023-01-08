@@ -6,14 +6,29 @@ using System.Threading.Tasks;
 
 namespace CSharpConsoleAppGame
 {
-	internal class Window : UI
-	{
-		public Window(int x_, int y_, int width_, int height_) : base(x_, y_, width_, height_)
-		{
-			X = x_;
-			Y = y_;
-			Width = width_;
-			Height = height_;
-		}
-	}
+    internal class Window : ImageArea
+    {
+        const char outlineChar = '▣';
+        public Window(int x_, int y_, int width_, int height_, char paddingChar) : base(x_, y_, width_, height_, paddingChar)
+        {
+            SetDefaultImage(Width, Height, paddingChar);
+            Contents = Image;
+        }
+
+        private void SetDefaultImage(int width, int height, char paddingChar)
+        {
+            for (int i = 0; i < height; i++)
+            {
+                for (int j = 0; j < width; j++)
+                {
+                    if (i == 0 || i == height - 1 || j == 0 || j == width - 1)
+                    {
+                        Image[i, j] = outlineChar.ToString();
+                    }
+                    else
+                        Image[i, j] = paddingChar.ToString();
+                }
+            }
+        }
+    }
 }

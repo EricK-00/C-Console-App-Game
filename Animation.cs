@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,43 +10,58 @@ namespace CSharpConsoleAppGame
 
 	internal class Animation
 	{
-		public static event EventHandler<Task> AnimatePlaying;
-
-		public void BlinkImage(IAnimatable animatableObject, int blinkCount)
+        public static void Blink(IAnimatable animatableObject, int blinkCount)
 		{
-			Task task = Task.Run(() => { Blink(animatableObject, blinkCount); });
-			task.Wait();
-			
-			AnimatePlaying?.Invoke(this, task);
-			
-			//while (!task.IsCompleted)
-			{
-				//BlockUserInput();
-			}
+			Task task = Task.Run(() => { BlinkByChar(animatableObject, blinkCount); });
+			InputManager.BlockInput(task);
+        }
+
+        public static void BlinkWithColor(IAnimatable animatableObject, int blinkCount, ConsoleColor color)
+        {
+            Task task = Task.Run(() => { BlinkByColor(animatableObject, blinkCount, color); });
+            InputManager.BlockInput(task);
+        }
+
+        public static void OnCursorOver(IAnimatable animatableObject)
+        {
+            Task task = Task.Run(() => { BlinkByColor(animatableObject, 2, ConsoleColor.Black); });
+            InputManager.BlockInput(task);
+        }
+
+		private static void BlinkArea()
+		{
+
 		}
 
-		private Task<bool> Blink(IAnimatable animatableObject, int blinkCount)
+        private static void BlinkByChar(IAnimatable animatableObject, int blinkCount)
 		{
-			string[,] blinkImage = new string[animatableObject.Image.GetLength(0), animatableObject.Image.GetLength(1)];
+			string[,] blinkImage = new string[animatableObject.Contents.GetLength(0), animatableObject.Contents.GetLength(1)];
 			for (int i = 0; i < blinkImage.GetLength(0); i++)
 			{
 				for (int j = 0; j < blinkImage.GetLength(1); j++)
 				{
-					blinkImage[i, j] = "00";
+					blinkImage[i, j] = "xx";
 				}
 			}
 
 			for (int i = 0; i < blinkCount; i++)
 			{
-				Screen.PlaceOnScreen(animatableObject, blinkImage);
-				Screen.RenderScreen(null);
+				Screen.Render(animatableObject, blinkImage);
 				Task.Delay(50).Wait();
-				Screen.PlaceOnScreen(animatableObject);
-				Screen.RenderScreen(null);
+				Screen.Render(animatableObject);
 				Task.Delay(50).Wait();
 			}
-
-			return Task.FromResult(true);
 		}
+
+		private static void BlinkByColor(IAnimatable animatableObject, int blinkCount, ConsoleColor color)
+		{
+            for (int i = 0; i < blinkCount; i++)
+            {
+                Screen.RenderWithColor(animatableObject, animatableObject.Contents, color);
+                Task.Delay(50).Wait();
+                Screen.Render(animatableObject);
+                Task.Delay(50).Wait();
+            }
+        }
 	}
 }
