@@ -10,7 +10,9 @@ namespace CSharpConsoleAppGame
 	{
 		불꽃 = 0,
 		물,
-		풀
+		풀,
+		비행,
+		없음
 	}
 
 	public struct CharacterStats
@@ -41,12 +43,29 @@ namespace CSharpConsoleAppGame
 		//string heldItem;
 		//string feature;
 		Skill[] skills = new Skill[4];
-		Type characterType;
+		public Type FirstType { get; }
+		public Type SecondType { get; }
 
 		public Character(string name, CharacterStats stats)
 		{
 			Name = name;
 			Stats = stats;
+		}
+
+        public Character(string name, CharacterStats stats, Type first, Type second)
+        {
+            Name = name;
+            Stats = stats;
+			FirstType = first;
+			SecondType = second;
+        }
+
+        public string GetTypeString()
+		{
+			if (SecondType == Type.없음)
+				return $"{FirstType}";
+			else
+				return $"{FirstType} {SecondType}";
 		}
 	}
 }

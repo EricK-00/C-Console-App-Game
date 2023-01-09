@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CSharpConsoleAppGame
+namespace battleTest
 {
     public struct Rank
     {
@@ -22,15 +22,14 @@ namespace CSharpConsoleAppGame
     internal class InBattleCharacter
     {
         private Character baseCharacter;
-        public CharacterStats DefaultStats { get; set; }
-        public CharacterStats BattleStats;
+        public CharacterStats DefaultStats { get; }
+        public CharacterStats BattleStats { get; }
         public string StatusConditon = string.Empty;
 
         //string heldItem;
         //string feature;
         Skill[] skills = new Skill[4];
-        public Type FirstType { get; }
-        public Type SecondType { get; }
+        Type characterType;
 
         public InBattleCharacter(Character baseCharacter_)
         {
@@ -46,12 +45,7 @@ namespace CSharpConsoleAppGame
 
         public void Damaged(int damage)
         {
-            BattleStats.Hp -= damage;
-            if (BattleStats.Hp <= 0)
-            {
-                BattleStats.Hp = 0;
-                Stuned();
-            }
+
         }
 
         private void Stuned()
