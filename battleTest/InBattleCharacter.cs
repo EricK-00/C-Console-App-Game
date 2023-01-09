@@ -21,7 +21,7 @@ namespace battleTest
 
     internal class InBattleCharacter
     {
-        private Character baseCharacter;
+        public Character BaseCharacter { get; }
         public CharacterStats DefaultStats { get; }
         public CharacterStats BattleStats { get; }
         public string StatusConditon = string.Empty;
@@ -33,7 +33,7 @@ namespace battleTest
 
         public InBattleCharacter(Character baseCharacter_)
         {
-            baseCharacter = baseCharacter_;
+            BaseCharacter = baseCharacter_;
             DefaultStats = baseCharacter_.Stats;
             BattleStats = DefaultStats;
         }

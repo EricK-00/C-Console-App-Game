@@ -5,6 +5,8 @@
         static void Main(string[] args)
         {
             Console.WriteLine("Hello, World!");
+            Battle battle = new Battle();
+            battle.PlayBattle();
         }
     }
 }

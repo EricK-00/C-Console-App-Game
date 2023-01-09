@@ -21,16 +21,14 @@ namespace battleTest
         //스킬
         //명중률체크
         //데미지계산(랭크/상태이상반영 실능력치 + 자속체크 + 타입상성체크 + 급소 체크) + 상대 체력 체크
-        //스킬부가효과
+        //스킬부가효과, 풀죽음 체크
 
-        //풀죽음 체크
         //[후 공격자]
         //위와 동일
 
-        //날씨?
+        //날씨
 
         //선 공격자의 후 상태이상 체크
-
         //후 공격자의 후 상태이상 체크
 
         //++배틀 캐릭터 턴 카운트
@@ -53,14 +51,24 @@ namespace battleTest
         InBattleCharacter[] allyCharacters;
         InBattleCharacter[] foeCharacters;
 
-        public void playBattle()
+        public void PlayBattle()
         {
             SetUp();
 
+            ThrowBall_Foe(0);
             ThrowBall(0);
-            Selection1();
 
-            CompareSpeed(allyCharacters[0], foeCharacters[0]);
+            Selection1();
+            int foeNum = FoeSelection();
+
+            if (CompareSpeed(allyCharacters[0], foeCharacters[0]))
+            {
+
+            }
+            else
+            {
+
+            }
 
             ++battleTurn;
         }
@@ -69,8 +77,8 @@ namespace battleTest
         {
             characters = new Character[Player.MAX_CHARACTER_COUNT];
             characters[0] = new Character("리자몽", new CharacterStats(105, 110, 80, 108));
-            characters[1] = new Character("리자몽", new CharacterStats(100, 110, 80, 99));
-            characters[2] = new Character("리자몽", new CharacterStats(99, 110, 80, 1));
+            characters[1] = new Character("이상해꽃", new CharacterStats(100, 110, 80, 99));
+            characters[2] = new Character("거북왕", new CharacterStats(99, 110, 80, 1));
 
             allyCharacters = new InBattleCharacter[3];
             allyCharacters[0] = new InBattleCharacter(characters[0]);
@@ -83,9 +91,14 @@ namespace battleTest
             foeCharacters[2] = new InBattleCharacter(characters[0]);
         }
 
-        private void ThrowBall(int battleCharacterIndex)
+        private void ThrowBall(int index)
         {
-            Console.WriteLine($"가랏, {battleCharacterIndex}번 포켓몬!");
+            Console.WriteLine($"가랏, {allyCharacters[index].BaseCharacter.Name}!");
+        }
+
+        private void ThrowBall_Foe(int index)
+        {
+            Console.WriteLine($"상대는 {foeCharacters[index].BaseCharacter.Name}을(를) 내보냈다.");
         }
 
         private void Selection1()
@@ -111,22 +124,22 @@ namespace battleTest
             switch (Console.ReadKey().Key)
             {
                 case ConsoleKey.D1:
-                    Selection2_1();
+                    Console.WriteLine("1!");
                     break;
 
                 case ConsoleKey.D2:
-                    Selection2_2();
+                    Console.WriteLine("2!");
                     break;
 
                 case ConsoleKey.D3:
-                    Selection2_1();
+                    Console.WriteLine("3!");
                     break;
 
                 case ConsoleKey.D4:
-                    Selection2_2();
+                    Console.WriteLine("4!");
                     break;
 
-                case ConsoleKey.Escape:
+                case ConsoleKey.Q:
                     Selection1();
                     break;
             }
@@ -146,10 +159,15 @@ namespace battleTest
                     ThrowBall(2);
                     break;
 
-                case ConsoleKey.Escape:
+                case ConsoleKey.Q:
                     Selection1();
                     break;
             }
+        }
+
+        private int FoeSelection()
+        {
+            return new Random().Next(0, 3 + 1);
         }
 
         private bool CompareSpeed(InBattleCharacter ally, InBattleCharacter foe)
