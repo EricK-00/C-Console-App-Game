@@ -19,7 +19,7 @@ namespace CSharpConsoleAppGame
     }
 
 
-    internal class InBattleCharacter
+    internal class InBattleCharacter : Character
     {
         private CharacterStats DefaultStats;
         private CharacterStats BattleStats;
@@ -37,7 +37,7 @@ namespace CSharpConsoleAppGame
         public int Height { get; protected set; }
         public string[,] Image { get; set; }
 
-        public InBattleCharacter(CharacterStats stats)
+        public InBattleCharacter(string name, CharacterStats stats) : base (name, stats)
         {
             DefaultStats = stats;
             BattleStats = DefaultStats;

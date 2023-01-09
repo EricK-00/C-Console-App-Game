@@ -10,37 +10,47 @@ namespace CSharpConsoleAppGame
 {
     internal class TextArea : UI
     {
-        public string Text { get; private set; }
+        public string TextString { get; private set; }
 
         public TextArea(int x_, int y_, int width_, int height_, string text_) : base(x_, y_, width_, height_)
         {
-            Text = text_;
+            TextString = text_;
             SetContents();
+
+            Screen.Render(this);
         }
 
-        private void SetContents()
+		public TextArea(int x_, int y_, int width_, int height_, string text_, int delayTerm) : base(x_, y_, width_, height_)
+		{
+			TextString = text_;
+			SetContents();
+
+            Screen.RenderTextWithDelay(this, delayTerm);
+		}
+
+		private void SetContents()
         {
             int strIndex = 0;
             for (int i = 0; i < Height; i++)
             {
                 for (int j = 0; j < Width; j++)
                 {
-                    if (strIndex >= Text.Length)
+                    if (strIndex >= TextString.Length)
                         goto END;
 
-                    Contents[i, j] = Text[strIndex].ToString();
+                    Contents[i, j] = TextString[strIndex].ToString();
                     ++strIndex;
                 }
             }
-END: { }
+END: { ContentsSize = strIndex; }
         }
 
         public void Rewrite(string newText)
         {
-            Screen.ClearText(this);
-            Text = newText;
+            Screen.Clear(this);
+            TextString = newText;
             SetContents();
-            Screen.RenderText(this);
+            Screen.Render(this);
         }
     }
 }

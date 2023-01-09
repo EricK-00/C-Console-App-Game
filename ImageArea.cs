@@ -21,9 +21,11 @@ namespace CSharpConsoleAppGame
                 }
             }
             Contents = Image;
+
+            Screen.Render(this);
         }
 
-        public ImageArea(int x_, int y_, int width_, int height_, char paddingChar) : base(x_, y_, width_, height_)
+		public ImageArea(int x_, int y_, int width_, int height_, char paddingChar) : base(x_, y_, width_, height_)
         {
             Image = new string[Height, Width];
             for (int i = 0; i < height_; i++)
@@ -34,6 +36,13 @@ namespace CSharpConsoleAppGame
                 }
             }
             Contents = Image;
+
+            Screen.Render(this);
         }
-    }
+
+		protected ImageArea(int x_, int y_, int width_, int height_) : base(x_, y_, width_, height_)
+		{
+			Image = new string[Height, Width];
+		}
+	}
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,82 +9,62 @@ namespace CSharpConsoleAppGame
 {
     internal class InputManager
     {
-        public static List<UI> SelectableUIList = new List<UI>();
-        private static int cursor = 0;
-        public static bool isblocked = false;
+        private static int cursor = -1;
         private static bool isSelected = false;
-        private static ConsoleKey lastKey = default;
 
-        public static int GetSelection()
+        public static int GetSelection(List<UI> container)
         {
+            if (container == null)
+                return -1;
+
             isSelected = false;
-            Animation.OnCursorOver(SelectableUIList[cursor]);
             while (!isSelected)
             {
-                GetInput();
+                GetInput(container);
             }
 
             return cursor;
         }
 
-        private static void GetInput()
+        public static void SetCursorDefault()
         {
-            if (isblocked)
-                return;
+            cursor = -1;
+        }
 
-            ConsoleKey key;
-            if (lastKey != default)
-            {
-                key = lastKey;
-            }
-            else
-            {
-                key = Console.ReadKey(true).Key;
-            }
+        private static void GetInput(List<UI> container)
+        {
+            ConsoleKey key = Console.ReadKey(true).Key;
             switch (key)
             {
                 case ConsoleKey.LeftArrow:
-                    Console.WriteLine("111");
-                    lastKey = default;
                     --cursor;
                     if (cursor < 0)
-                        cursor = SelectableUIList.Count - 1;
-                    Animation.OnCursorOver(SelectableUIList[cursor]);
+                        cursor = container.Count - 1;
+                    Animation.OnCursorOver(container[cursor]);
                     break;
 
                 case ConsoleKey.RightArrow:
-                    Console.WriteLine("222");
-                    lastKey = default;
                     ++cursor;
-                    if (cursor > SelectableUIList.Count - 1)
+                    if (cursor > container.Count - 1)
                         cursor = 0;
-                    Animation.OnCursorOver(SelectableUIList[cursor]);
+                    Animation.OnCursorOver(container[cursor]);
                     break;
 
                 case ConsoleKey.Spacebar:
-                    Console.WriteLine("333");
-                    lastKey = default;
+                    if (cursor == -1)
+                        return;
                     isSelected = true;
+                    Animation.OnCursorOver(container[cursor]);
                     break;
                 default:
-                    lastKey = default;
                     break;
             }
         }
 
-        public static void BlockInput(Task task)
+        public static void ClearInputBuffer()
         {
-            while (!task.IsCompleted)
-            {
-                isblocked = true;
-                ConsoleKey key = Console.ReadKey(true).Key;
-                if (task.IsCompleted)
-                {
-                    lastKey = key;
-                    break;
-                }
-            }
-            isblocked = false;
+            while (Console.KeyAvailable)
+                Console.ReadKey(true);
         }
     }
 }

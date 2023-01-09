@@ -5,11 +5,15 @@ namespace CSharpConsoleAppGame
 	internal class Player
 	{
 		int winCount;
-		const int MAX_CHARACTER_COUNT = 3;
-		Character[] myCharacter = new Character[MAX_CHARACTER_COUNT];
+		public const int MAX_CHARACTER_COUNT = 3;
+		public Character[] Characters { get; } = new Character[MAX_CHARACTER_COUNT];
 
-		Player()
+		public Player()
 		{
+			Characters = new Character[MAX_CHARACTER_COUNT];
+			for (int i = 0; i < Characters.Length; i++)
+				Characters[i] = new Character("default", new CharacterStats(-1, -1, -1, -1));
+
 			for (int i = 0; i < MAX_CHARACTER_COUNT; i++)
 			{
 				//myCharacter[i] = new Character();
@@ -18,9 +22,9 @@ namespace CSharpConsoleAppGame
 
 		public void SwapCharacter(int index1, int index2)
 		{
-			Character temp = myCharacter[index1];
-			myCharacter[index1] = myCharacter[index2];
-			myCharacter[index2] = temp;
+			Character temp = Characters[index1];
+			Characters[index1] = Characters[index2];
+			Characters[index2] = temp;
 		}
 
 		public int RandomCharacterGenerater()

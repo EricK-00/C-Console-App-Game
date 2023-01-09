@@ -33,6 +33,8 @@ namespace CSharpConsoleAppGame
 
 	internal class Character
 	{
+		int id;
+
 		public string Name { get; }
 		public CharacterStats Stats { get; }
 
