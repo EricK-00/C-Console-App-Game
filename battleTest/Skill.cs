@@ -3,29 +3,39 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace battleTest
 {
 	internal class Skill
 	{
 
-		int id;
+		public int Id { get; }
 		public string Name { get; set; }
-		public string Description { get; set; }
 		public int Power { get; set; }
 		public int HitRate { get; set; }
 
 		public Type SkillType { get; set; }
-		public delegate void SkillEffect (InBattleCharacter attacker, InBattleCharacter defender, int rate);
 
-		public Skill()
+		//public string Description { get; set; }
+
+		public Skill(int id_)
 		{
-            //SkillEffect effect = RankUp();
+			Id = id_;
+			Name = SkillData.GetSkill(id_).Name;
+			Power = SkillData.GetSkill(id_).Power;
+			HitRate = SkillData.GetSkill(id_).HitRate;
+			SkillType = SkillData.GetSkill(id_).SkillType;
 		}
 
-		public void RankUp(InBattleCharacter attacker, InBattleCharacter defender)
+		public Skill(int id_, string name, int power, int hitRate, Type skillType)// , string description)
 		{
-			attacker.Poisoned();
+			Id = id_;
+			Name = name;
+			Power = power;
+			HitRate = hitRate;
+			SkillType = skillType;
+			//Description = description;
 		}
 	}
 }
