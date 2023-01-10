@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace battleTest
+namespace CSharpConsoleAppGame
 {
 	class CharacterData
 	{
-		private static List<Character> characterList;
+        public const int BATTLE_CHARACTER_COUNT = 3;
+        private static List<Character> characterList;
 
 		public static void Initialize(List<Character> characters)
 		{
@@ -18,7 +19,7 @@ namespace battleTest
 
 		public static Character GetCharacter(int id)
 		{
-			if (characterList.Count >= id || id <= 0)
+			if (characterList.Count <= id || id <= 0)
 				return characterList[0];
 
 			return characterList[id];

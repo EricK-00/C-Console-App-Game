@@ -97,9 +97,9 @@ namespace CSharpConsoleAppGame
 
 			for (int i = 0; i < blinkCount; i++)
 			{
-				Screen.Render(0, 0, Screen.SCREEN_WIDTH, Screen.SCREEN_HEIGHT, blinkImage);
+				Screen.Render(0, 0, Screen.WIDTH, Screen.HEIGHT, blinkImage);
 				Task.Delay(50).Wait();
-				Screen.Render(0, 0, Screen.SCREEN_WIDTH, Screen.SCREEN_HEIGHT, viewImage);
+				Screen.Render(0, 0, Screen.WIDTH, Screen.HEIGHT, viewImage);
 				Task.Delay(50).Wait();
 			}
 		}

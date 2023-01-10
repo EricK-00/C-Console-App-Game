@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace battleTest
+namespace CSharpConsoleAppGame
 {
 	public enum Type
 	{
@@ -41,7 +41,7 @@ namespace battleTest
 			table[(int)Type.불꽃, (int)Type.노말] = (int)TypeEffectiveness.보통;
 			table[(int)Type.불꽃, (int)Type.없음] = (int)TypeEffectiveness.보통;
 
-			table[(int)Type.물, (int)Type.불꽃] = (int)TypeEffectiveness.별로;
+			table[(int)Type.물, (int)Type.불꽃] = (int)TypeEffectiveness.굉장;
 			table[(int)Type.물, (int)Type.물] = (int)TypeEffectiveness.별로;
 			table[(int)Type.물, (int)Type.풀] = (int)TypeEffectiveness.별로;
 			table[(int)Type.물, (int)Type.비행] = (int)TypeEffectiveness.보통;

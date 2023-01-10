@@ -4,9 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace battleTest
+namespace CSharpConsoleAppGame
 {
-	class SkillData
+    enum SkillCategory
+    {
+        물리 = 0,
+        특수,
+        변화
+    }
+
+    class SkillData
 	{
 		private static List<Skill> skillList;
 		public static void Initialize(List<Skill> skills)
@@ -17,7 +24,7 @@ namespace battleTest
 
 		public static Skill GetSkill(int id)
 		{
-			if (skillList.Count >= id || id <= 0)
+			if (skillList.Count <= id || id <= 0)
 				return skillList[0];
 
 			return skillList[id];

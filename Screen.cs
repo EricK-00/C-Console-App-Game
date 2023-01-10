@@ -9,15 +9,15 @@ namespace CSharpConsoleAppGame
 	//utf-8
 	internal class Screen
 	{
-	    public const int SCREEN_WIDTH = 45;
-		public const int SCREEN_HEIGHT = 25;
+	    public const int WIDTH = 45;
+		public const int HEIGHT = 25;
 		private const string DEFAULT_WORD = "+";
-		public static string[,] View { get; } = new string[SCREEN_HEIGHT, SCREEN_WIDTH];
+		public static string[,] View { get; } = new string[HEIGHT, WIDTH];
 		public static void Initialize()
 		{
-			for (int i = 0; i < SCREEN_HEIGHT; i++)
+			for (int i = 0; i < HEIGHT; i++)
 			{
-				for (int j = 0; j < SCREEN_WIDTH; j++)
+				for (int j = 0; j < WIDTH; j++)
 				{
                     Console.SetCursorPosition(2 * j, i);
                     Console.Write(DEFAULT_WORD.PadRight(2, ' '));
@@ -30,9 +30,9 @@ namespace CSharpConsoleAppGame
 		public static void RenderScreenView()
 		{
 			Console.SetCursorPosition(0, 0);
-			for (int i = 0; i < SCREEN_HEIGHT; i++)
+			for (int i = 0; i < HEIGHT; i++)
 			{
-				for (int j = 0; j < SCREEN_WIDTH; j++)
+				for (int j = 0; j < WIDTH; j++)
 				{
 					if (Encoding.Default.GetBytes(View[i, j]).Length == 1)
 					{
@@ -318,9 +318,9 @@ END: { }
 		{
 			int viewPosX, viewPosY;
 
-			for (int i = 0; i < SCREEN_HEIGHT; i++)
+			for (int i = 0; i < HEIGHT; i++)
 			{
-				for (int j = 0; j < SCREEN_WIDTH; j++)
+				for (int j = 0; j < WIDTH; j++)
 				{
 					viewPosX = 0 + j;
 					viewPosY = 0 + i;
