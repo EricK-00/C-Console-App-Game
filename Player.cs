@@ -4,14 +4,19 @@ namespace CSharpConsoleAppGame
 {
 	internal class Player
 	{
-		int winCount;
+		public int WinCount { get; private set; }
 		public Character[] Characters { get; } = new Character[CharacterData.BATTLE_CHARACTER_COUNT];
 
 		public Player()
 		{
 			Characters = new Character[CharacterData.BATTLE_CHARACTER_COUNT];
 			for (int i = 0; i < Characters.Length; i++)
-				Characters[i] = new Character(0);
+				Characters[i] = CharacterData.GetRandomCharacter();
+		}
+
+		public void WinTheBattle()
+		{
+			++WinCount;
 		}
 
 		//public void SwapCharacter(int index1, int index2)

@@ -15,6 +15,7 @@ namespace CSharpConsoleAppGame
 
     class SkillData
 	{
+		public const int MAX_SKILL_NAME_LENGTH = 6;
 		private static List<Skill> skillList;
 		public static void Initialize(List<Skill> skills)
 		{

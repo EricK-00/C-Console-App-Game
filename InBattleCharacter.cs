@@ -72,7 +72,19 @@ namespace CSharpConsoleAppGame
 			return message;
 		}
 
-        public string GetStatusConditionMessage()
+		public string GetConditionString()
+		{
+            string message = string.Empty;
+            if (Conditon != StatusCondition.없음)
+                message = Conditon.ToString();
+
+            if (BattleStats.Hp <= 0)
+                message = "기절";
+
+            return message;
+		}
+
+		public string GetConditionActionMessage()
         {
             string message = string.Empty;
 
@@ -120,15 +132,21 @@ namespace CSharpConsoleAppGame
 			}
         }
 
-        public void Damaged(int damage)
+        public void Damaged(int damage, Window window, int hpTextLine)
         {
             BattleStats.Damaged(damage);
+            Animation.Blink(window, 3, 'x', 30);
+            window.RewriteWindowContents($"HP:{BattleStats.Hp}/{DefaultStats.Hp}", hpTextLine, true);
         }
 
-        public void CheckStuned()
+        public void CheckStuned(Window window)
         {
             if (BattleStats.Hp <= 0)
-                Console.WriteLine($"{BattleName}은(는) 쓰러졌다.");
+            {
+                UIPreset.CreateScriptTextArea($"{BattleName}은(는) 쓰러졌다.", 1, true);
+                Console.ReadKey();
+                window.ClearContents();
+            }
         }
 
         public void AddTurnCount()

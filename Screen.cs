@@ -11,7 +11,7 @@ namespace CSharpConsoleAppGame
 	{
 	    public const int WIDTH = 45;
 		public const int HEIGHT = 25;
-		private const string DEFAULT_WORD = "+";
+		private const string DEFAULT_WORD = " ";
 		public static string[,] View { get; } = new string[HEIGHT, WIDTH];
 		public static void Initialize()
 		{
@@ -82,7 +82,7 @@ END: { }
             });
 
 			task.Wait();
-            InputManager.ClearInputBuffer();
+            InputBufferCleaner.Clear();
         }
 
 		public static void Render(int x, int y, int width, int height, string[,] image)

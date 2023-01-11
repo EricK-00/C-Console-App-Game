@@ -24,6 +24,7 @@ namespace CSharpConsoleAppGame
         public string[,] Contents { get; protected set; }
 
 		public int ContentsSize { get; protected set; }
+
 		public UI(int x_, int y_, string[,] image_)
 		{
 			X = x_;

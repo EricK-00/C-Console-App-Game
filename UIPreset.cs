@@ -9,12 +9,12 @@ namespace CSharpConsoleAppGame
 {
     internal class UIPreset
     {
-        public const int PRINT_DELAY = 25;
+        public const int PRINT_DELAY = 20;
 
-        const int WINDOW_X = 0;
-        const int WINDOW_Y = 15;
-        const int WINDOW_WIDTH = Screen.WIDTH;
-        const int WINDOW_HEIGHT = 10;
+        public const int WINDOW_X = 0;
+        public const int WINDOW_Y = 15;
+        public const int WINDOW_WIDTH = Screen.WIDTH;
+        public const int WINDOW_HEIGHT = 10;
 
         public static Window CreateScriptWindow()
         {
@@ -35,7 +35,13 @@ namespace CSharpConsoleAppGame
                 return new TextArea(WINDOW_X + 1, WINDOW_Y + line, WINDOW_WIDTH - 2, 1, text);
         }
 
-        public static void ClearScript(int line)
+		public static TextArea CreateScriptTextArea(string text, int line, int delayTerm)
+		{
+			ClearScript(line);
+			return new TextArea(WINDOW_X + 1, WINDOW_Y + line, WINDOW_WIDTH - 2, 1, text, delayTerm);
+		}
+
+		public static void ClearScript(int line)
         {
             Screen.Clear(WINDOW_X + 1, WINDOW_Y + line, WINDOW_WIDTH - 2, 1);
         }

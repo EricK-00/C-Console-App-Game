@@ -42,9 +42,16 @@ namespace CSharpConsoleAppGame
             FirstType = first;
             SecondType = second;
 
-            Skills = new Skill[Math.Min(4, skill_.Length)];
-            for (int i = 0; i < Skills.Length; i++)
+            SetUpSkills();
+            for (int i = 0; i < skill_.Length; i++)
                 Skills[i] = new Skill(skill_[i].Id);
+        }
+
+        private void SetUpSkills()
+        {
+            Skills = new Skill[4];
+            for (int i = 0; i < Skills.Length; i++)
+                Skills[i] = new Skill(0);
         }
 
         public string GetTypeString()

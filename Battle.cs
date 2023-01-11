@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.SymbolStore;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,21 +42,33 @@ namespace CSharpConsoleAppGame
         //배틀 캐릭터 [0]번과 [x]번이 교체
         //교체 전 배틀 캐릭터 턴 카운트 초기화(=1), 교체 전 배틀 캐릭터 랭크 초기화
 
+        const int HP_TEXT_LINE = 4;
+        const int CONDITION_TEXT_LINE = 13;
+
         int battleTurn = 0;
 
         InBattleCharacter[] allyCharacters;
         InBattleCharacter[] foeCharacters;
 
-        bool win = false;
+        Window allyWindow;
+        Window foeWindow;
+
+		bool win = false;
         bool battleEnd = false;
         bool setNewAlly = true;
         bool setNewFoe = true;
 
-        public bool PlayBattle(Player player)
+        public Battle()
+        {
+			allyWindow = new Window(5, 0, 17, 15, ' ');
+			foeWindow = new Window(Screen.WIDTH - 7 - 15, 0, 17, 15, ' ');
+		}
+
+        public bool PlayBattle(Player player, out int[] foeId)
         {
             SetUpBattleCharacter(player);
 
-            while (!battleEnd)
+			while (!battleEnd)
             {
 				++battleTurn;
 
@@ -73,36 +86,34 @@ namespace CSharpConsoleAppGame
                 allyCharacters[0].AddTurnCount();
                 foeCharacters[0].AddTurnCount();
 
-                TextArea hpText = new TextArea(10, 0, Screen.WIDTH, 1, $"{allyCharacters[0].BattleName}:HP({allyCharacters[0].BattleStats.Hp}) / {foeCharacters[0].BattleName}:HP({foeCharacters[0].BattleStats.Hp})");
-
                 int mySkillIndex = SelectAction();
                 int foeSkillIndex = FoeSelectAction();
 
-                hpText = new TextArea(10, 0, Screen.WIDTH, 1, $"{allyCharacters[0].BattleName}:HP({allyCharacters[0].BattleStats.Hp}) / {foeCharacters[0].BattleName}:HP({foeCharacters[0].BattleStats.Hp})");
-
-                (InBattleCharacter firstAttacker, InBattleCharacter secondAttacker, int firstSkillIndex, int secondSkillIndex) = 
-                    GetAttackerOrder(allyCharacters[0], foeCharacters[0], mySkillIndex, foeSkillIndex);
+                (InBattleCharacter firstAttacker, InBattleCharacter secondAttacker, 
+                    Window firstAWindow, Window secondAWindow,
+                    int firstSkillIndex, int secondSkillIndex) = 
+                    GetAttackerOrder(allyCharacters[0], foeCharacters[0], allyWindow, foeWindow, mySkillIndex, foeSkillIndex);
 
 				if (mySkillIndex == -1)
                 {
-                    PlayTurnAction(foeCharacters[0], allyCharacters[0], foeSkillIndex);
+                    PlayTurnAction(foeCharacters[0], allyCharacters[0], foeWindow, allyWindow, foeSkillIndex);
 
                     if (firstAttacker.BattleStats.Hp > 0)
-						PlayTurnEndAction(firstAttacker);
+						PlayTurnEndAction(firstAttacker, firstAWindow);
 					if (secondAttacker.BattleStats.Hp > 0)
-						PlayTurnEndAction(secondAttacker);
+						PlayTurnEndAction(secondAttacker, secondAWindow);
 				}
                 else
                 {
                     if (firstAttacker.BattleStats.Hp > 0)
-						PlayTurnAction(firstAttacker, secondAttacker, firstSkillIndex);
+						PlayTurnAction(firstAttacker, secondAttacker, firstAWindow, secondAWindow, firstSkillIndex);
 					if (secondAttacker.BattleStats.Hp > 0)
-						PlayTurnAction(secondAttacker, firstAttacker, secondSkillIndex);
+						PlayTurnAction(secondAttacker, firstAttacker, secondAWindow, firstAWindow, secondSkillIndex);
 
                     if (firstAttacker.BattleStats.Hp > 0)
-                        PlayTurnEndAction(firstAttacker);
+                        PlayTurnEndAction(firstAttacker, firstAWindow);
 					if (secondAttacker.BattleStats.Hp > 0)
-						PlayTurnEndAction(secondAttacker);
+						PlayTurnEndAction(secondAttacker, secondAWindow);
                 }
 
 				if (allyCharacters[0].BattleStats.Hp <= 0)
@@ -115,15 +126,14 @@ namespace CSharpConsoleAppGame
                     }
                     else
                     {
-                        UIPreset.CreateScriptTextArea("교체할 포켓몬을 선택하세요.", 1, true);
-                        SelectNextCharacter();
-                        setNewAlly = true;
+						Replace(new SelectableUI(), false);
+						setNewAlly = true;
                     }
                 }
 
                 if (foeCharacters[0].BattleStats.Hp <= 0)
                 {
-                    if (!SwapBattleOrder(ref foeCharacters[0], ref foeCharacters[1]) && !SwapBattleOrder(ref foeCharacters[0], ref foeCharacters[2]))
+					if (!SwapBattleOrder(ref foeCharacters[0], ref foeCharacters[1]) && !SwapBattleOrder(ref foeCharacters[0], ref foeCharacters[2]))
                     {
                         win = true;
                         battleEnd = true;
@@ -135,17 +145,20 @@ namespace CSharpConsoleAppGame
                     }
                 }
             }
-            BattleResult(win);
+            BattleResult(win, player);
 
+
+            foeId = new int[CharacterData.BATTLE_CHARACTER_COUNT] { foeCharacters[0].Id, foeCharacters[1].Id, foeCharacters[2].Id }; 
             return win;
         }
 
-        private void BattleResult(bool win)
+        private void BattleResult(bool win, Player player)
         {
             if (win)
             {
                 UIPreset.CreateScriptTextArea("배틀에 승리했다!", 1, true);
                 Console.ReadKey(true);
+                player.WinTheBattle();
             }
             else
             {
@@ -173,6 +186,7 @@ namespace CSharpConsoleAppGame
             UIPreset.ClearAllScript();
             UIPreset.CreateScriptTextArea($"돌아와, {allyCharacters[prevCharacterIndex].BattleName}", 1, true);
             Console.ReadKey(true);
+            allyWindow.ClearContents();
         }
 
         private void ThrowBall()
@@ -180,6 +194,23 @@ namespace CSharpConsoleAppGame
             UIPreset.ClearAllScript();
             UIPreset.CreateScriptTextArea($"가랏, {allyCharacters[0].BattleName}!", 1, true);
             Console.ReadKey(true);
+            allyWindow.RewriteWindowContents(
+                new string[]
+                {
+                    $"",
+					$"{allyCharacters[0].BattleName}",
+					$"{allyCharacters[0].GetTypeString()}",
+                    $"HP:{allyCharacters[0].BattleStats.Hp}/{allyCharacters[0].DefaultStats.Hp}",
+                    $"",
+					$"물리공격:{allyCharacters[0].DefaultStats.Attack}",
+					$"물리방어:{allyCharacters[0].DefaultStats.Defense}",
+					$"특수공격:{allyCharacters[0].DefaultStats.SpAttack}",
+					$"특수방어:{allyCharacters[0].DefaultStats.SpDefense}",
+					$"스피드:{allyCharacters[0].DefaultStats.Speed}",
+                    $"",
+					$"",
+					$"{allyCharacters[0].GetConditionString()}"
+                }, true);
         }
 
         private void FoeThrowBall()
@@ -187,6 +218,23 @@ namespace CSharpConsoleAppGame
             UIPreset.ClearAllScript();
             UIPreset.CreateScriptTextArea($"상대는 {foeCharacters[0].DefaultName}을(를) 내보냈다.", 1, true);
             Console.ReadKey(true);
+            foeWindow.RewriteWindowContents(
+                new string[]
+                {
+                    $"",
+                    $"{foeCharacters[0].BattleName}",
+                    $"{foeCharacters[0].GetTypeString()}",
+                    $"HP:{foeCharacters[0].BattleStats.Hp}/{foeCharacters[0].DefaultStats.Hp}",
+                    $"",
+                    $"",
+                    $"",
+                    $"",
+                    $"",
+                    $"",
+                    $"",
+                    $"",
+                    $"{foeCharacters[0].GetConditionString()}"
+                }, true);
         }
 
         private int SelectAction()
@@ -195,30 +243,41 @@ namespace CSharpConsoleAppGame
             bool isValid = false;
 
             UIPreset.ClearAllScript();
-            UIPreset.CreateScriptTextArea("1.싸운다 2.교체한다", 1, true);
+
+            List<UI> fightOrReplace = new List<UI>()
+            {
+                new Window(Screen.WIDTH / 2 - 13, UIPreset.WINDOW_Y + 3, 7, 4, ' ', '=', new string[1] {"싸운다"}, true),
+                new Window(Screen.WIDTH / 2 + 6, UIPreset.WINDOW_Y + 3, 8, 4, ' ', '=', new string[1] {"교체한다"}, true)
+		};
+
+            SelectableUI selectableUI = new SelectableUI(fightOrReplace, CursorMoveMode.Horizonal);
 
             while (!isValid)
-			{
-				switch (Console.ReadKey(true).Key)
+            {
+                switch (selectableUI.GetSelection())
                 {
-                    case ConsoleKey.D1:
-                        mySelecion = SelectSkill();
+                    case 0:
+                        mySelecion = SelectSkill(selectableUI);
                         if (mySelecion == -1)
                         {
                             UIPreset.ClearAllScript();
-                            UIPreset.CreateScriptTextArea("1.싸운다 2.교체한다", 1, true);
+                            Screen.Render(fightOrReplace[0]);
+                            Screen.Render(fightOrReplace[1]);
+                            selectableUI = new SelectableUI(fightOrReplace, CursorMoveMode.Horizonal);
                             continue;
                         }
                         else
                             isValid = true;
                         break;
 
-                    case ConsoleKey.D2:
-                        bool end = Replace();
+                    case 1:
+                        bool end = Replace(selectableUI, true);
                         if (!end)
                         {
                             UIPreset.ClearAllScript();
-                            UIPreset.CreateScriptTextArea("1.싸운다 2.교체한다", 1, true);
+							Screen.Render(fightOrReplace[0]);
+							Screen.Render(fightOrReplace[1]);
+							selectableUI = new SelectableUI(fightOrReplace, CursorMoveMode.Horizonal);
                             continue;
                         }
                         else
@@ -231,72 +290,134 @@ namespace CSharpConsoleAppGame
 			return mySelecion;
 		}
 
-        private int SelectSkill()
+        private int SelectSkill(SelectableUI selectableUI)
         {
-            UIPreset.CreateScriptTextArea("기술을 선택하세요.", 1, true);
-            UIPreset.CreateScriptTextArea($"{allyCharacters[0].Skills[0]?.Name} {allyCharacters[0].Skills[1]?.Name} " +
-                $"{allyCharacters[0].Skills[2]?.Name} {allyCharacters[0].Skills[3]?.Name}", 3, false);
+            UIPreset.ClearAllScript();
+
+            List<UI> skills = new List<UI>();
+
+            for (int i = 0; i < allyCharacters[0].Skills.Length; i++)
+            {
+                skills.Add(
+				new Window(Screen.WIDTH / 2 - 15 + 16 * (i % 2), UIPreset.WINDOW_Y + 1 + 4 * (i / 2), 
+                15, 4, ' ', '=', new string[1] {$"{allyCharacters[0].Skills[i].Name}" }, true));
+			}
+
+            selectableUI = new SelectableUI( skills, CursorMoveMode.Square, 2, 2);
 
             while (true)
             {
-                switch (Console.ReadKey(true).Key)
+                switch (selectableUI.GetSelection())
                 {
-                    case ConsoleKey.D1:
+                    case 0:
+                        if (allyCharacters[0].Skills[0].Id == 0)
+                            continue;
+
                         UIPreset.ClearAllScript();
                         return 0;
 
-                    case ConsoleKey.D2:
-                        UIPreset.ClearAllScript();
+                    case 1:
+						if (allyCharacters[0].Skills[1].Id == 0)
+							continue;
+
+						UIPreset.ClearAllScript();
                         return 1;
 
-                    case ConsoleKey.D3:
-                        UIPreset.ClearAllScript();
+                    case 2:
+						if (allyCharacters[0].Skills[2].Id == 0)
+							continue;
+
+						UIPreset.ClearAllScript();
                         return 2;
 
-                    case ConsoleKey.D4:
-                        UIPreset.ClearAllScript();
+                    case 3:
+						if (allyCharacters[0].Skills[3].Id == 0)
+							continue;
+
+						UIPreset.ClearAllScript();
                         return 3;
 
-                    case ConsoleKey.Q:
+                    case -1:
                         return -1;
                 }
             }
         }
 
-        private bool Replace()
+        private bool Replace(SelectableUI selectableUI, bool isAlive)
         {
-            UIPreset.CreateScriptTextArea("교체할 포켓몬을 선택하세요.", 1, true);
-            UIPreset.CreateScriptTextArea($"{allyCharacters[0].DefaultName} {allyCharacters[0].BattleStats.Hp}/{allyCharacters[0].DefaultStats.Hp} | " +
-                $"{allyCharacters[1].DefaultName} {allyCharacters[1].BattleStats.Hp}/{allyCharacters[1].DefaultStats.Hp} | " +
-                $"{allyCharacters[2].DefaultName} {allyCharacters[2].BattleStats.Hp}/{allyCharacters[2].DefaultStats.Hp}", 3, false);
+			UIPreset.ClearAllScript();
+			UIPreset.CreateScriptTextArea("내보낼 포켓몬을 선택하세요.", 1, false);
+
+			List<UI> characters = new List<UI>();
+			for (int i = 0; i < CharacterData.BATTLE_CHARACTER_COUNT; i++)
+			{
+				characters.Add(
+				new Window(1 + 15 * i, UIPreset.WINDOW_Y + 2, 13, 7, ' ', '=', new string[] {
+					$"『{allyCharacters[i].DefaultName}』",
+					$"{allyCharacters[i].GetTypeString()}",
+                    $"HP:{allyCharacters[i].BattleStats.Hp}/{allyCharacters[i].DefaultStats.Hp}",
+                    $"",
+                    $"{allyCharacters[i].GetConditionString()}"
+				}, true));
+			}
+
+			selectableUI = new SelectableUI( characters, CursorMoveMode.Horizonal);
+
             while (true)
             {
-                switch (Console.ReadKey(true).Key)
+                switch (selectableUI.GetSelection())
                 {
-                    case ConsoleKey.D2:
+					case 0:
+                        if (isAlive)
+                            UIPreset.CreateScriptTextArea("전투 중인 포켓몬입니다.", 1, true);
+                        else
+                            UIPreset.CreateScriptTextArea("기절한 포켓몬은 내보낼 수 없습니다.", 1, true);
+
+						Console.ReadKey(true);
+                        UIPreset.ClearScript(1);
+						UIPreset.CreateScriptTextArea("내보낼 포켓몬을 선택하세요.", 1, false);
+						continue;
+					case 1:
                         if (!SwapBattleOrder(ref allyCharacters[0], ref allyCharacters[1]))
                         {
-                            UIPreset.CreateScriptTextArea("기절한 포켓몬은 내보낼 수 없습니다.", 2, true);
-                            continue;
+                            UIPreset.CreateScriptTextArea("기절한 포켓몬은 내보낼 수 없습니다.", 1, true);
+							Console.ReadKey(true);
+							UIPreset.ClearScript(1);
+							UIPreset.CreateScriptTextArea("내보낼 포켓몬을 선택하세요.", 1, false);
+							continue;
                         }
 
-                        ReturnToBall(1);
-                        ThrowBall();
+                        if (isAlive)
+                        {
+                            ReturnToBall(1);
+                            ThrowBall();
+                        }
                         return true;
 
-                    case ConsoleKey.D3:
+                    case 2:
                         if (!SwapBattleOrder(ref allyCharacters[0], ref allyCharacters[2]))
                         {
-                            UIPreset.CreateScriptTextArea("기절한 포켓몬은 내보낼 수 없습니다.", 2, true);
-                            continue;
+                            UIPreset.CreateScriptTextArea("기절한 포켓몬은 내보낼 수 없습니다.", 1, true);
+							Console.ReadKey(true);
+							UIPreset.ClearScript(1);
+							UIPreset.CreateScriptTextArea("내보낼 포켓몬을 선택하세요.", 1, false);
+							continue;
                         }
 
-                        ReturnToBall(2);
-                        ThrowBall();
+                        if (isAlive)
+                        {
+                            ReturnToBall(2);
+                            ThrowBall();
+                        }
                         return true;
 
-                    case ConsoleKey.Q:
-                        return false;
+                    case -1:
+                        if (isAlive)
+                        {
+                            return false;
+                        }
+                        else
+                            continue;
                 }
             }
         }
@@ -306,55 +427,20 @@ namespace CSharpConsoleAppGame
             return new Random().Next(0, 3 + 1);
         }
 
-        private (InBattleCharacter, InBattleCharacter, int, int) GetAttackerOrder(InBattleCharacter character1, InBattleCharacter character2, 
-            int skillIndex1, int skillIndex2)
+        private (InBattleCharacter, InBattleCharacter, Window, Window, int, int) GetAttackerOrder(
+            InBattleCharacter character1, InBattleCharacter character2, Window window1, Window window2, int skillIndex1, int skillIndex2)
         {
             if (character1.BattleStats.Speed == character2.BattleStats.Speed)
             {
                 if (new Random().Next(0, 99 + 1) < 50)
-                    return (character1, character2, skillIndex1, skillIndex2);
+                    return (character1, character2, window1, window2, skillIndex1, skillIndex2);
                 else
-                    return (character2, character1, skillIndex2, skillIndex1);
+                    return (character2, character1, window2, window1, skillIndex2, skillIndex1);
             }
             else if (character1.BattleStats.Speed > character2.BattleStats.Speed)
-                return (character1, character2, skillIndex1, skillIndex2);
+                return (character1, character2, window1, window2, skillIndex1, skillIndex2);
             else
-                return (character2, character1, skillIndex2, skillIndex1);
-        }
-
-        private bool SelectNextCharacter()
-        {
-            UIPreset.ClearAllScript();
-            UIPreset.CreateScriptTextArea("내보낼 포켓몬을 선택하세요.", 1, true);
-            UIPreset.CreateScriptTextArea($"{allyCharacters[0].DefaultName} {allyCharacters[0].BattleStats.Hp}/{allyCharacters[0].DefaultStats.Hp} | " +
-    $"{allyCharacters[1].DefaultName} {allyCharacters[1].BattleStats.Hp}/{allyCharacters[1].DefaultStats.Hp} | " +
-    $"{allyCharacters[2].DefaultName} {allyCharacters[2].BattleStats.Hp}/{allyCharacters[2].DefaultStats.Hp}", 3, false);
-            while (true)
-            {
-                switch (Console.ReadKey(true).Key)
-                {
-                    case ConsoleKey.D1:
-                        UIPreset.CreateScriptTextArea("기절한 포켓몬은 내보낼 수 없습니다.", 2, true);
-                        continue;
-                    case ConsoleKey.D2:
-                        if (!SwapBattleOrder(ref allyCharacters[0], ref allyCharacters[1]))
-                        {
-                            UIPreset.CreateScriptTextArea("기절한 포켓몬은 내보낼 수 없습니다.", 2, true);
-                            continue;
-                        }
-                        UIPreset.ClearAllScript();
-                        return true;
-
-                    case ConsoleKey.D3:
-                        if (!SwapBattleOrder(ref allyCharacters[0], ref allyCharacters[2]))
-                        {
-                            UIPreset.CreateScriptTextArea("기절한 포켓몬은 내보낼 수 없습니다.", 2, true);
-                            continue;
-                        }
-                        UIPreset.ClearAllScript();
-                        return true;
-                }
-            }
+                return (character2, character1, window2, window1, skillIndex2, skillIndex1);
         }
 
         private bool SwapBattleOrder(ref InBattleCharacter mainCharacter, ref InBattleCharacter targetCharacter)
@@ -368,25 +454,27 @@ namespace CSharpConsoleAppGame
             return true;
         }
 
-        private void PlayTurnAction(InBattleCharacter attacker, InBattleCharacter defender, int skillIndex)
+        private void PlayTurnAction(InBattleCharacter attacker, InBattleCharacter defender, 
+            Window attackerWindow, Window defenderWindow, int skillIndex)
         {
             bool skipAction = false;
+            bool miss = false;
             bool isCritical = false;
 
-			if (attacker.Conditon == StatusCondition.마비)
+            if (attacker.Conditon == StatusCondition.마비)
             {
                 if (new Random().Next(0, 99 + 1) < 50)
                 {
-					skipAction = true;
-					attacker.GetStatusConditionMessage();
+                    skipAction = true;
+                    attacker.GetConditionActionMessage();
                 }
-			}
-			else if (attacker.Conditon == StatusCondition.얼음)
+            }
+            else if (attacker.Conditon == StatusCondition.얼음)
             {
                 if (new Random().Next(0, 99 + 1) < 90)
                 {
-					skipAction = true;
-					attacker.GetStatusConditionMessage();
+                    skipAction = true;
+                    attacker.GetConditionActionMessage();
                 }
                 else
                 {
@@ -394,7 +482,17 @@ namespace CSharpConsoleAppGame
                     UIPreset.CreateScriptTextArea("얼음이 풀렸다!", 1, true);
                     Console.ReadKey(true);
                 }
-			}
+            }
+
+            if (attacker.Skills[skillIndex].Category != SkillCategory.변화 &&
+                (defender.BattleStats.Hp <= 0 || new Random().Next(0, 99 + 1) >= attacker.Skills[skillIndex].HitRate))
+            {
+                skipAction = true;
+                UIPreset.CreateScriptTextArea($"{attacker.GetSkillMessage(skillIndex)}", 1, true);
+                Console.ReadKey(true);
+                UIPreset.CreateScriptTextArea("그러나 빗나갔다.", 1, true);
+                Console.ReadKey(true);
+            }
 
             if (!skipAction)
             {
@@ -403,12 +501,6 @@ namespace CSharpConsoleAppGame
 
                 if (attacker.Skills[skillIndex].Category != SkillCategory.변화)
                 {
-                    if (defender.BattleStats.Hp <= 0 || new Random().Next(0, 99 + 1) >= attacker.Skills[skillIndex].HitRate)
-                    {
-                        UIPreset.CreateScriptTextArea("그러나 빗나갔다.", 1, true);
-                        Console.ReadKey(true);
-                    }
-
                     float mainTypeBonus = 1f;
                     if (attacker.FirstType == attacker.Skills[skillIndex].SkillType ||
                     attacker.SecondType == attacker.Skills[skillIndex].SkillType)
@@ -435,9 +527,9 @@ namespace CSharpConsoleAppGame
 
                     if (damage < 1 && typeEffectiveness != (int)TypeTable.TypeEffectiveness.없음)
                         damage = 1;
-                    defender.Damaged(damage);
+                    defender.Damaged(damage, defenderWindow, HP_TEXT_LINE);
 
-                    
+
                     //UIPreset.CreateScriptTextArea(($"[{attacker.BattleName}] <{attacker.Skills[skillIndex].Name}> " +
                     //    $"{{{attacker.Skills[skillIndex].SkillType}}} 데미지: {damage}, 자속: {mainTypeBonus}, 크리: ({criticalDamage}, {isCritical}), " +
                     //    $"위력: {attacker.Skills[skillIndex].Power}, 명중률: {attacker.Skills[skillIndex].HitRate}, 상성: {typeEffectiveness}, " +
@@ -467,31 +559,37 @@ namespace CSharpConsoleAppGame
                         Console.ReadKey(true);
                     }
 
-                        defender.CheckStuned();
+                    defender.CheckStuned(defenderWindow);
                 }
 
                 SkillData.GetSkillEffect(attacker.Skills[skillIndex].Id);
             }
-		}
+        }
 
-        private void PlayTurnEndAction(InBattleCharacter character)
+        private void PlayTurnEndAction(InBattleCharacter character, Window characterWindow)
         {
 			if (character.Conditon == StatusCondition.독)
 			{
                 int maxHp = character.DefaultStats.Hp;
-                character.Damaged(maxHp / 8);
-                character.GetStatusConditionMessage();
+                int damage = maxHp / 8;
+                if (damage < 1)
+                    damage = 1;
+                character.Damaged(damage, characterWindow, HP_TEXT_LINE);
+                character.GetConditionActionMessage();
                 Console.ReadKey(true);
             }
 			else if (character.Conditon == StatusCondition.화상)
 			{
 				int maxHp = character.DefaultStats.Hp;
-				character.Damaged(maxHp / 8);
-				character.GetStatusConditionMessage();
+				int damage = maxHp / 8;
+				if (damage < 1)
+					damage = 1;
+				character.Damaged(damage, characterWindow, HP_TEXT_LINE);
+				character.GetConditionActionMessage();
                 Console.ReadKey(true);
             }
 
-            character.CheckStuned();
+            character.CheckStuned(characterWindow);
         }
     }
 }

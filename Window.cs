@@ -11,7 +11,7 @@ namespace CSharpConsoleAppGame
 {
     internal class Window : ImageArea
     {
-        const char OUT_LINE_CHAR = '▣';
+        const char DEFAULT_OUT_LINE_CHAR = '=';
         public int BlankAreaXMin { get; }
         public int BlankAreaXMax { get; }
         public int BlankAreaYMin { get; }
@@ -21,10 +21,46 @@ namespace CSharpConsoleAppGame
         public int BlankAreaSize { get; }
 
         private char paddingChar;
+        private char outlineChar = DEFAULT_OUT_LINE_CHAR;
 
-        public Window(int x_, int y_, int width_, int height_, char paddingChar_) : base(x_, y_, width_, height_)
+		public Window(int x_, int y_, int width_, int height_, char paddingChar_) : base(x_, y_, width_, height_)
+		{
+			paddingChar = paddingChar_;
+			BlankAreaXMin = X + 1;
+			BlankAreaXMax = X + Width - 1;
+			BlankAreaYMin = Y + 1;
+			BlankAreaYMax = Y + Height - 1;
+			BlankAreaWidth = Width - 2;
+			BlankAreaHeight = Height - 2;
+			BlankAreaSize = BlankAreaWidth * BlankAreaHeight;
+
+			Contents = SetDefaultWindow(Width, Height, paddingChar);
+
+			Screen.Render(this);
+		}
+
+		public Window(int x_, int y_, int width_, int height_, char paddingChar_, string[] windowContents, bool align)
+			: base(x_, y_, width_, height_)
+		{
+			paddingChar = paddingChar_;
+			BlankAreaXMin = X + 1;
+			BlankAreaXMax = X + Width - 1;
+			BlankAreaYMin = Y + 1;
+			BlankAreaYMax = Y + Height - 1;
+			BlankAreaWidth = Width - 2;
+			BlankAreaHeight = Height - 2;
+			BlankAreaSize = BlankAreaWidth * BlankAreaHeight;
+
+			SetDefaultWindow(Width, Height, paddingChar);
+			Contents = SetWindowContents(windowContents, align);
+
+			Screen.Render(this);
+		}
+
+		public Window(int x_, int y_, int width_, int height_, char paddingChar_, char outlineChar_) : base(x_, y_, width_, height_)
         {
             paddingChar = paddingChar_;
+            outlineChar = outlineChar_;
             BlankAreaXMin = X + 1;
             BlankAreaXMax = X + Width - 1;
             BlankAreaYMin = Y + 1;
@@ -38,11 +74,12 @@ namespace CSharpConsoleAppGame
             Screen.Render(this);
         }
 
-        public Window(int x_, int y_, int width_, int height_, char paddingChar_, string[] windowContents, bool align) 
+        public Window(int x_, int y_, int width_, int height_, char paddingChar_, char outlineChar_, string[] windowContents, bool align) 
             : base(x_, y_, width_, height_)
         {
             paddingChar = paddingChar_;
-            BlankAreaXMin = X + 1;
+			outlineChar = outlineChar_;
+			BlankAreaXMin = X + 1;
             BlankAreaXMax = X + Width - 1;
             BlankAreaYMin = Y + 1;
             BlankAreaYMax = Y + Height - 1;
@@ -63,7 +100,7 @@ namespace CSharpConsoleAppGame
                 for (int j = 0; j < width; j++)
                 {
                     if (i == 0 || i == height - 1 || j == 0 || j == width - 1)
-                        Image[i, j] = OUT_LINE_CHAR.ToString();
+                        Image[i, j] = outlineChar.ToString();
                     else
                         Image[i, j] = paddingChar.ToString();
                 }
@@ -138,6 +175,12 @@ namespace CSharpConsoleAppGame
         public void RewriteWindowContents(string newContents, int lineIndex, bool align)
         {
             Contents = SetWindowContents(newContents, lineIndex, align);
+            Screen.Render(this);
+        }
+
+        public void ClearContents()
+        {
+            SetDefaultWindow(Width, Height, paddingChar);
             Screen.Render(this);
         }
     }

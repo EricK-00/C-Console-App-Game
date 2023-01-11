@@ -9,14 +9,14 @@ namespace CSharpConsoleAppGame
 {
 	internal class Game
 	{
-		bool isGameover;
-		bool winTheBattle;
-		string gameState;
+		bool isGameOver;
 		Player player;
+		Window scriptWindow;
+		readonly string[] battleOrderString = { "첫", "두", "세", "네", "다섯", "여섯", "일곱", "마지막" };
 
 		public Game()
 		{
-            LoadData();
+            DataLoader.LoadData();
             PrintKeyGuide();
             player = new Player();
         }
@@ -24,208 +24,172 @@ namespace CSharpConsoleAppGame
 		private void PrintKeyGuide()
 		{
 			Console.SetCursorPosition(0, Screen.HEIGHT + 1);
-			Console.Write("키 입력: 다음\n←, →: 커서이동\n스페이스바: 선택");
+			Console.Write($"키 입력: 다음\n방향키: 커서이동\n스페이스바: 선택\n선택 취소: q");
 		}
-		private void LoadData()
+
+		private void DebugBattle()
 		{
-			SkillData.Initialize(new List<Skill>
-			{
-				new Skill(0, "default", 0, 100, Type.없음, SkillCategory.변화),
-				new Skill(1, "화염방사", 95, 100, Type.불꽃, SkillCategory.특수),
-				new Skill(2, "불대문자", 120, 85, Type.불꽃, SkillCategory.특수),
-				new Skill(3, "에어슬래시", 80, 100, Type.비행, SkillCategory.특수),
-				new Skill(4, "몸통박치기", 40, 100, Type.노말, SkillCategory.물리),
-				new Skill(5, "기가드레인", 40, 100, Type.풀, SkillCategory.특수),
-				new Skill(6, "파도타기", 95, 100, Type.물, SkillCategory.특수),
-				new Skill(7, "오물폭탄", 80, 100, Type.독, SkillCategory.특수)
-			});
-			CharacterData.Initialize(new List<Character>
-			{
-				//+75, +20
-				new Character(0, "default", Type.없음, Type.없음, new CharacterStats(1,1,1,1,1,1), new Skill[1]{new Skill(0)}),
-				new Character(1, "리자몽", Type.불꽃, Type.비행, new CharacterStats(100,100,100,100,100,100), new Skill[4]{new Skill(1), new Skill(2), new Skill(3), new Skill(4)}),
-				new Character(2, "이상해꽃", Type.풀, Type.독, new CharacterStats(75,75,125,75,100,125), new Skill[4]{new Skill(4), new Skill(5), new Skill(7), new Skill(6)}),
-				new Character(3, "거북왕", Type.물, Type.없음, new CharacterStats(111,99,88,77,66,55), new Skill[4]{new Skill(1), new Skill(4), new Skill(6), new Skill(7)}),
-			});
+			player.Characters[0] = CharacterData.GetRandomCharacter();
+			player.Characters[1] = CharacterData.GetRandomCharacter();
+			player.Characters[2] = CharacterData.GetRandomCharacter();
 		}
 
 		public void PlayGame()
 		{
             Console.CursorVisible = false;
 
-			InitializeMainUI();
+			ShowStartScreenUI();
 
-            InitializeFirstLobbyUI();
-
-			InitializeBattleUI();
-        }
-
-        private void InitializeMainUI()
-        {
-			Screen.Initialize();
-			Window mainWindow = new Window(0, 0, Screen.WIDTH, Screen.HEIGHT, ' ');
-            TextArea text = new TextArea(Screen.WIDTH / 2 - 7, Screen.HEIGHT - 3, Screen.WIDTH - 2, 1, "아무 키나 눌러 게임 시작");
-            Console.ReadKey(true);
-        }
-
-		private void InitializeFirstLobbyUI()
-		{
-			Screen.ClearAll();
-
-            Window viewWindow = new Window(0, 15, 45, 10, ' ');
-            TextArea text1 = new TextArea(1, 16, 43, 1, "배틀팩토리에 오신 것을 환영합니다.", UIPreset.PRINT_DELAY);
-			Console.ReadKey(true);
-			TextArea text2 = new TextArea(1, 17, 43, 1, "배틀팩토리는 3마리의 포켓몬을 대여 받아 배틀을 하는 장소입니다.", UIPreset.PRINT_DELAY);
-			Console.ReadKey(true);
-			Screen.Clear(text1);
-			Screen.Clear(text2);
-
-            //랜덤 생성
-
-            Character[] characters = new Character[CharacterData.BATTLE_CHARACTER_COUNT];
-            characters[0] = CharacterData.GetRandomCharacter();
-            characters[1] = CharacterData.GetRandomCharacter();
-            characters[2] = CharacterData.GetRandomCharacter();
-
-			Window[] selectableWindows = new Window[CharacterData.BATTLE_CHARACTER_COUNT];
-			for (int i = 0; i < CharacterData.BATTLE_CHARACTER_COUNT; i++)
+			while (!isGameOver)
 			{
-				selectableWindows[i] =
-				new Window(0 + 15 * i, 0, 15, 14, ' ', new string[] {
-					$"『{characters[i].DefaultName}』",
-					$"{characters[i].GetTypeString()}",
-					$"HP:{characters[i].DefaultStats.Hp}",
-					$"물리공격:{characters[i].DefaultStats.Attack}",
-					$"물리방어:{characters[i].DefaultStats.Defense}",
-					$"특수공격:{characters[i].DefaultStats.SpAttack}",
-					$"특수방어:{characters[i].DefaultStats.SpDefense}",
-					$"스피드:{characters[i].DefaultStats.Speed}",
-					$"",
-					$"{characters[i].Skills[0].Name} {characters[i].Skills[1].Name}",
-					$"{characters[i].Skills[2].Name} {characters[i].Skills[3].Name}",
-					//$"",                                                                                                                                       $"기술4:{characters[i].Skills[0]}",
-				}, true);
+				//DebugBattle();
+				ShowLobbyUI();
+				ShowBattleUI();
 			}
 
-			List<UI> selectableUIList = new List<UI>() {
-				selectableWindows[0],
-				selectableWindows[1],
-				selectableWindows[2]
-			};
-
-            text1 = new TextArea(1, 16, 43, 1, "당신이 대여 받을 포켓몬입니다.", UIPreset.PRINT_DELAY);
-			Console.ReadKey(true);
-			Screen.Clear(text1);
-
-			InputManager.SetCursorDefault();
-
-            char[] word = new char[CharacterData.BATTLE_CHARACTER_COUNT] { '첫', '두', '세' };
-			bool[] isSelected = new bool[CharacterData.BATTLE_CHARACTER_COUNT] { false, false, false };
-            for (int i = 0; i < CharacterData.BATTLE_CHARACTER_COUNT; i++)
+			if (player.WinCount == 10)
 			{
-				text1 = new TextArea(1, 16, 43, 1, $"{word[i]} 번째로 출전할 포켓몬을 선택해주세요.", UIPreset.PRINT_DELAY);
+				WinGame();
+			}
+			else
+			{
+				LoseGame();
+			}
+        }
+
+        private void ShowStartScreenUI()
+        {
+			Screen.Initialize();
+			Window startScreenWindow = new Window(0, 0, Screen.WIDTH, Screen.HEIGHT, ' ');
+            TextArea text = new TextArea(Screen.WIDTH / 2 - 7, Screen.HEIGHT - 3, Screen.WIDTH - 2, 1, "아무 키나 눌러 게임 시작");
+            Console.ReadKey(true);
+			Screen.Clear(text);
+        }
+
+		private void ShowLobbyUI()
+		{
+			if (player.WinCount == 0)
+			{
+				scriptWindow = new Window(0, 15, 45, 10, ' ');
+				UIPreset.CreateScriptTextArea("배틀팩토리에 오신 것을 환영합니다.", 1, true);
+				Console.ReadKey(true);
+				UIPreset.CreateScriptTextArea("배틀팩토리는 3마리의 포켓몬을 대여 받아 배틀을 하는 장소입니다.", 2, true);
+				Console.ReadKey(true);
+
+				UIPreset.ClearScript(2);
+				UIPreset.CreateScriptTextArea("3마리의 포켓몬을 대여해 드리겠습니다.", 1, true);
+				Console.ReadKey(true);
+				UIPreset.ClearScript(1);
+			}
+
+			SetCharacterOrder();
+        }
+
+		private void SetCharacterOrder()
+		{
+			Character[] characterOrder = new Character[CharacterData.BATTLE_CHARACTER_COUNT];
+			List<UI> selectableWindows = new List<UI>();
+
+			for (int i = 0; i < CharacterData.BATTLE_CHARACTER_COUNT; i++)
+			{
+				selectableWindows.Add(
+				new Window(0 + 15 * i, 0, 15, 14, ' ', new string[] {
+					$"『{player.Characters[i].DefaultName}』",
+					$"{player.Characters[i].GetTypeString()}",
+					$"HP:{player.Characters[i].DefaultStats.Hp}",
+					$"물리공격:{player.Characters[i].DefaultStats.Attack}",
+					$"물리방어:{player.Characters[i].DefaultStats.Defense}",
+					$"특수공격:{player.Characters[i].DefaultStats.SpAttack}",
+					$"특수방어:{player.Characters[i].DefaultStats.SpDefense}",
+					$"스피드:{player.Characters[i].DefaultStats.Speed}",
+					$"",
+					$"{player.Characters[i].Skills[0].Name} {player.Characters[i].Skills[1].Name}",
+					$"{player.Characters[i].Skills[2].Name} {player.Characters[i].Skills[3].Name}",
+					//$"",                                                                                                                                       $"기술4:{characters[i].Skills[0]}",
+				}, true));
+			}
+
+			SelectableUI selectableUI = new SelectableUI(selectableWindows, CursorMoveMode.Horizonal);
+			char[] word = new char[CharacterData.BATTLE_CHARACTER_COUNT] { '첫', '두', '세' };
+			bool[] isSelected = new bool[CharacterData.BATTLE_CHARACTER_COUNT] { false, false, false };
+			int[] prevSelection = new int[CharacterData.BATTLE_CHARACTER_COUNT] { 0, 0, 0 };
+			for (int i = 0; i < CharacterData.BATTLE_CHARACTER_COUNT; i++)
+			{
+				UIPreset.CreateScriptTextArea($"{word[i]} 번째로 출전할 포켓몬을 선택해주세요.", 1, true);
 
 				bool isValid = false;
 				while (!isValid)
 				{
-					switch (InputManager.GetSelection(selectableUIList))
+					switch (selectableUI.GetSelection())
 					{
 						case 0:
 							if (!isSelected[0])
 							{
-								player.Characters[i] = characters[0];
+								characterOrder[i] = player.Characters[0];
 								isSelected[0] = true;
+								prevSelection[i] = 0;
 								isValid = true;
-								break;
+								Animation.Selected(selectableWindows[0]);
 							}
 							else
 							{
-								Screen.Clear(text2);
-								text2 = new TextArea(1, 17, 43, 1, "이미 선택된 포켓몬입니다.", UIPreset.PRINT_DELAY);
-								continue;
+								UIPreset.CreateScriptTextArea("이미 선택된 포켓몬입니다.", 2, true);
 							}
-
+							break;
 						case 1:
 							if (!isSelected[1])
 							{
-								player.Characters[i] = characters[1];
-                                isSelected[1] = true;
-                                isValid = true;
-								break;
+								characterOrder[i] = player.Characters[1];
+								isSelected[1] = true;
+								prevSelection[i] = 1;
+								isValid = true;
+								Animation.Selected(selectableWindows[1]);
 							}
 							else
 							{
-								Screen.Clear(text2);
-								text2 = new TextArea(1, 17, 43, 1, "이미 선택된 포켓몬입니다.", UIPreset.PRINT_DELAY);
-								continue;
+								UIPreset.CreateScriptTextArea("이미 선택된 포켓몬입니다.", 2, true);
 							}
-
+							break;
 						case 2:
 							if (!isSelected[2])
 							{
-								player.Characters[i] = characters[2];
-                                isSelected[2] = true;
-                                isValid = true;
-								break;
+								characterOrder[i] = player.Characters[2];
+								isSelected[2] = true;
+								prevSelection[i] = 2;
+								isValid = true;
+								Animation.Selected(selectableWindows[2]);
 							}
 							else
 							{
-								Screen.Clear(text2);
-								text2 = new TextArea(1, 17, 43, 1, "이미 선택된 포켓몬입니다.", UIPreset.PRINT_DELAY);
-								continue;
+								UIPreset.CreateScriptTextArea("이미 선택된 포켓몬입니다.", 2, true);
 							}
+							break;
+						case -1:
+							if (i != 0)
+							{
+								i -= 2;
+								isSelected[prevSelection[i + 1]] = false;
+								isValid = true;
+							}
+							break;
 					}
-
 				}
-				Screen.Clear(text1);
-				Screen.Clear(text2);
+				UIPreset.ClearScript(1);
+				UIPreset.ClearScript(2);
 			}
 
-			foreach (UI ui in selectableUIList)
-				Screen.Clear(ui);
-			Screen.Clear(text1);
-
-            text1 = new TextArea(1, 16, 43, 1, "그럼 첫 번째 배틀을 시작합니다.", 50);
-            Console.ReadKey(true);
-			viewWindow.RewriteWindowContents(new string[1] { text1.TextString }, false);
-			Animation.BlinkWithColor(viewWindow, 7, ConsoleColor.Red);
-        }
-
-		private void InitializeSelectionUI()
-        {
-			Screen.ClearAll();
-
-			while (true)
+			for (int i = 0; i < player.Characters.Length; i++)
 			{
-				Window viewWindow = new Window(0, 15, 45, 10, ' ');
-				TextArea textt = new TextArea(1, 16, 30, 10, "교체할 포켓몬을 선택해 주세요.", 25);
-
-				List<UI> selectableUIList = new List<UI>() {
-				new Window(1, 2, 10, 10, '+'),
-				new Window(Screen.WIDTH / 2 - 3, 2, 10, 10, '='),
-				new Window(Screen.WIDTH - 1 - 7, 2, 10, 10, '-'),
-				new TextArea(Screen.WIDTH / 2 - 2, 13, 10, 1, "교체안함")
-			};
-
-				switch (InputManager.GetSelection(selectableUIList))
-				{
-					case 0:
-						TextArea text = new TextArea(1, 16, 10, 10, "1번 선택", 100);
-						break;
-
-					case 1:
-						TextArea text1 = new TextArea(1, 17, 10, 10, "2번 선택", 100);
-						break;
-
-					case 2:
-						TextArea text2 = new TextArea(1, 18, 10, 10, "3번 선택");
-						Console.ReadKey(true);
-						break;
-				}
+				player.Characters[i] = characterOrder[i];
 			}
+
+			UIPreset.CreateScriptTextArea($"그럼 {battleOrderString[player.WinCount]} 번째 배틀을 시작합니다.", 1, true);
+			Console.ReadKey(true);
+			//Animation.BlinkViewWithColor(7, ConsoleColor.Red, 35);
+			Animation.FadeView(30);
 		}
 
-        private void InitializeBattleUI()
+        private void ShowBattleUI()
         {
             //Animation.BlinkView(7, 'x');
             //Animation.BlinkViewWithColor(7, ConsoleColor.Red);
@@ -233,11 +197,52 @@ namespace CSharpConsoleAppGame
 
 			UIPreset.CreateScriptWindow();
 
-            Window allyWindow = new Window(5 - 1, 0, 15, 15, ' ');
-			Window foeWindow = new Window(Screen.WIDTH - 5 - 1 - 15, 0, 15, 15, ' ');
-
+			int[] foeId;
 			Battle battle = new Battle();
-			battle.PlayBattle(player);
+			if (battle.PlayBattle(player, out foeId))
+			{
+				//Animation
+				UIPreset.CreateScriptTextArea($"현재 {player.WinCount}승 중입니다.", 1, true);
+				Console.ReadKey(true);
+
+				//교체 선택
+				UIPreset.CreateScriptTextArea($"배틀에 승리하였으므로,", 1, true);
+				Console.ReadKey(true);
+				UIPreset.CreateScriptTextArea($"상대 포켓몬 중 하나와 교환할 수 있습니다.", 2, true);
+				Console.ReadKey(true);
+				UIPreset.ClearAllScript();
+
+
+				UIPreset.CreateScriptTextArea($"교환할 상대 포켓몬을 선택해주세요.", 1, true);
+				Console.ReadKey(true);
+				UIPreset.CreateScriptTextArea($"교환할 자신의 포켓몬을 선택해주세요.", 1, true);
+				Console.ReadKey(true);
+
+				//순서 선택
+				SetCharacterOrder();
+			}
+			else
+			{
+				isGameOver = true;
+			}
+		}
+
+		private void WinGame()
+		{
+			UIPreset.CreateScriptTextArea("축하합니다!", 1, true);
+			Console.ReadKey(true);
+			UIPreset.CreateScriptTextArea("모든 배틀에 승리하여 배틀펙토리를 제패하였습니다!", 2, true);
+			Console.ReadKey(true);
+			Console.SetCursorPosition(100, 100);
+		}
+
+		private void LoseGame()
+		{
+			UIPreset.CreateScriptTextArea("배틀에 패배하였습니다.", 1, true);
+			Console.ReadKey(true);
+			UIPreset.CreateScriptTextArea("다음에 다시 도전해주세요.", 2, true);
+			Console.ReadKey(true);
+			Console.SetCursorPosition(100, 100);
 		}
 	}
 }
