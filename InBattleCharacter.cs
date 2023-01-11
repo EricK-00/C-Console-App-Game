@@ -144,8 +144,9 @@ namespace CSharpConsoleAppGame
             if (BattleStats.Hp <= 0)
             {
                 UIPreset.CreateScriptTextArea($"{BattleName}은(는) 쓰러졌다.", 1, true);
-                Console.ReadKey();
+                Console.ReadKey(true);
                 window.ClearContents();
+                UIPreset.ClearScript(1);
             }
         }
 

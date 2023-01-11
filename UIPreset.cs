@@ -9,7 +9,7 @@ namespace CSharpConsoleAppGame
 {
     internal class UIPreset
     {
-        public const int PRINT_DELAY = 20;
+        public const int PRINT_DELAY = 15;
 
         public const int WINDOW_X = 0;
         public const int WINDOW_Y = 15;
@@ -30,15 +30,15 @@ namespace CSharpConsoleAppGame
         {
             ClearScript(line);
             if (isDelayed)
-                return new TextArea(WINDOW_X + 1, WINDOW_Y + line, WINDOW_WIDTH - 2, 1, text, PRINT_DELAY);
+                return new TextArea(WINDOW_X + 1, WINDOW_Y + line, text, PRINT_DELAY);
             else
-                return new TextArea(WINDOW_X + 1, WINDOW_Y + line, WINDOW_WIDTH - 2, 1, text);
+                return new TextArea(WINDOW_X + 1, WINDOW_Y + line, text);
         }
 
 		public static TextArea CreateScriptTextArea(string text, int line, int delayTerm)
 		{
 			ClearScript(line);
-			return new TextArea(WINDOW_X + 1, WINDOW_Y + line, WINDOW_WIDTH - 2, 1, text, delayTerm);
+			return new TextArea(WINDOW_X + 1, WINDOW_Y + line, text, delayTerm);
 		}
 
 		public static void ClearScript(int line)

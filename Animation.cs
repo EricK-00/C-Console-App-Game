@@ -56,14 +56,14 @@ namespace CSharpConsoleAppGame
 
 		public static void Fade(IAnimatable animatableObject, int delayTerm)
 		{
-			Task task = Task.Run(() => { FadeObject(animatableObject, delayTerm); }) ;
+			Task task = Task.Run(() => { FadeObject(animatableObject); }) ;
 			task.Wait();
 			InputBufferCleaner.Clear();
 		}
 
-		public static void FadeView(int delayTerm)
+		public static void FadeView()
 		{
-			Task task = Task.Run(() => { FadeObject(delayTerm); });
+			Task task = Task.Run(() => { FadeObject(); });
 			task.Wait();
 			InputBufferCleaner.Clear();
 		}
@@ -139,21 +139,24 @@ namespace CSharpConsoleAppGame
 			}
 		}
 
-		private static void FadeObject(IAnimatable animatableObject, int delayTerm)
+		private static void FadeObject(IAnimatable animatableObject)
 		{
-			Console.ForegroundColor = ConsoleColor.Gray;
+            Console.ForegroundColor = ConsoleColor.White;
+            Screen.Render(animatableObject);
+            Task.Delay(75).Wait();
+            Console.ForegroundColor = ConsoleColor.Gray;
 			Screen.Render(animatableObject);
-			Task.Delay(delayTerm).Wait();
+			Task.Delay(75).Wait();
 			Console.ForegroundColor = ConsoleColor.DarkGray;
 			Screen.Render(animatableObject);
-			Task.Delay(delayTerm).Wait();
+			Task.Delay(75).Wait();
 			Console.ForegroundColor = ConsoleColor.Black;
 			Screen.Render(animatableObject);
-			Task.Delay(delayTerm).Wait();
+			Task.Delay(75).Wait();
 			Screen.Clear(animatableObject);
 		}
 
-		private static void FadeObject(int delayTerm)
+		private static void FadeObject()
 		{
 			string[,] viewImage = new string[Screen.View.GetLength(0), Screen.View.GetLength(1)];
 
@@ -164,17 +167,22 @@ namespace CSharpConsoleAppGame
 					viewImage[i, j] = Screen.View[i, j];
 				}
 			}
-
-			Console.ForegroundColor = ConsoleColor.Gray;
+            Console.ForegroundColor = ConsoleColor.White;
+            Screen.Render(0, 0, Screen.WIDTH, Screen.HEIGHT, viewImage);
+            Task.Delay(75).Wait();
+            Console.ForegroundColor = ConsoleColor.Gray;
 			Screen.Render(0, 0, Screen.WIDTH, Screen.HEIGHT, viewImage);
-			Task.Delay(delayTerm).Wait();
+			Task.Delay(75).Wait();
 			Console.ForegroundColor = ConsoleColor.DarkGray;
 			Screen.Render(0, 0, Screen.WIDTH, Screen.HEIGHT, viewImage);
-			Task.Delay(delayTerm).Wait();
+			Task.Delay(75).Wait();
 			Console.ForegroundColor = ConsoleColor.Black;
 			Screen.Render(0, 0, Screen.WIDTH, Screen.HEIGHT, viewImage);
-			Task.Delay(delayTerm).Wait();
+			Task.Delay(75).Wait();
+			Console.ResetColor();
 			Screen.ClearAll();
+			Screen.RenderScreenOutLine();
+			UIPreset.CreateScriptWindow();
 		}
 	}
 }

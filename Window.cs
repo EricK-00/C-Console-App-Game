@@ -11,7 +11,8 @@ namespace CSharpConsoleAppGame
 {
     internal class Window : ImageArea
     {
-        const char DEFAULT_OUT_LINE_CHAR = '=';
+        //const char DEFAULT_OUT_LINE_CHAR = '=';
+        const char DEFAULT_OUT_LINE_CHAR = '…';
         public int BlankAreaXMin { get; }
         public int BlankAreaXMax { get; }
         public int BlankAreaYMin { get; }

@@ -11,21 +11,11 @@ namespace CSharpConsoleAppGame
 	{
 	    public const int WIDTH = 45;
 		public const int HEIGHT = 25;
-		private const string DEFAULT_WORD = " ";
 		public static string[,] View { get; } = new string[HEIGHT, WIDTH];
-		public static void Initialize()
+		public static void RenderScreenOutLine()
 		{
-			for (int i = 0; i < HEIGHT; i++)
-			{
-				for (int j = 0; j < WIDTH; j++)
-				{
-                    Console.SetCursorPosition(2 * j, i);
-                    Console.Write(DEFAULT_WORD.PadRight(2, ' '));
-					View[i, j] = DEFAULT_WORD;
-				}
-				Console.WriteLine();
-			}
-		}
+			new Window(0, 0, WIDTH, HEIGHT, ' ');
+        }
 
 		public static void RenderScreenView()
 		{
@@ -57,9 +47,6 @@ namespace CSharpConsoleAppGame
                 {
                     for (int j = 0; j < text.Width; j++)
                     {
-                        if (text.ContentsSize <= i * text.Width + j)
-                            goto END;
-
 						viewPosX = text.X + j;
 						viewPosY = text.Y + i;
 						Console.SetCursorPosition(2 * viewPosX, viewPosY);
@@ -78,7 +65,6 @@ namespace CSharpConsoleAppGame
                     }
                     Console.WriteLine();
                 }
-END: { }
             });
 
 			task.Wait();
@@ -115,9 +101,6 @@ END: { }
 			{
 				for (int j = 0; j < ui.Width; j++)
 				{
-					if (ui.ContentsSize <= i * ui.Width + j)
-						goto END;
-
 					viewPosX = ui.X + j;
 					viewPosY = ui.Y + i;
 					Console.SetCursorPosition(2 * viewPosX, viewPosY);
@@ -130,8 +113,6 @@ END: { }
 					View[viewPosY, viewPosX] = ui.Contents[i, j];
 				}
 			}
-
-		END: { }
 		}
 
 		public static void Render(IAnimatable animatable)
@@ -142,10 +123,6 @@ END: { }
 			{
 				for (int j = 0; j < animatable.Width; j++)
 				{
-					if (animatable.ContentsSize <= i * animatable.Width + j)
-						goto END;
-
-
 					viewPosX = animatable.X + j;
 					viewPosY = animatable.Y + i;
 					Console.SetCursorPosition(2 * viewPosX, viewPosY);
@@ -158,24 +135,19 @@ END: { }
 					View[viewPosY, viewPosX] = animatable.Contents[i, j];
 				}
 			}
-
-		END: { }
 		}
 
 		public static void Render(IAnimatable animatable, string[,] image)
 		{
 			int viewPosX, viewPosY;
 
-			if (image.GetLength(0) != animatable.Height || image.GetLength(1) != animatable.Width)
+			if (image.GetLength(0) * image.GetLength(1) != animatable.ContentsSize)
 				return;
 
 			for (int i = 0; i < image.GetLength(0); i++)
 			{
 				for (int j = 0; j < image.GetLength(1); j++)
 				{
-					if (animatable.ContentsSize <= i * image.GetLength(1) + j)
-						goto END;
-
 					viewPosX = animatable.X + j;
 					viewPosY = animatable.Y + i;
 					Console.SetCursorPosition(2 * viewPosX, viewPosY);
@@ -188,8 +160,6 @@ END: { }
 					View[viewPosY, viewPosX] = image[i, j];
 				}
 			}
-
-		END: { }
 		}
 
         public static void RenderWithColor(IAnimatable animatable, ConsoleColor color)
@@ -200,9 +170,6 @@ END: { }
             {
                 for (int j = 0; j < animatable.Width; j++)
                 {
-					if (animatable.ContentsSize <= i * animatable.Width + j)
-						goto END;
-
 					viewPosX = animatable.X + j;
 					viewPosY = animatable.Y + i;
 					Console.ForegroundColor = color;
@@ -216,7 +183,6 @@ END: { }
 					View[viewPosY, viewPosX] = animatable.Contents[i, j];
 				}
             }
-		END: { }
 			Console.ResetColor();
         }
 
@@ -224,15 +190,13 @@ END: { }
         {
 			int viewPosX, viewPosY;
 
-			if (image.GetLength(0) != animatable.Height || image.GetLength(1) != animatable.Width)
+			if (image.GetLength(0) * image.GetLength(1) != animatable.ContentsSize)
 				return;
 
             for (int i = 0; i < image.GetLength(0); i++)
             {
                 for (int j = 0; j < image.GetLength(1); j++)
                 {
-                    if (animatable.ContentsSize <= i * image.GetLength(1) + j)
-                        goto END;
 
 					Console.ForegroundColor = color;
 
@@ -248,7 +212,6 @@ END: { }
 					View[viewPosY, viewPosX] = image[i, j];
 				}
             }
-		END: { }
 			Console.ResetColor();
         }
 
@@ -278,9 +241,6 @@ END: { }
             {
                 for (int j = 0; j < ui.Width; j++)
                 {
-					if (ui.ContentsSize <= i * ui.Width + j)
-						goto END;
-
 					viewPosX = ui.X + j;
 					viewPosY = ui.Y + i;
 					Console.SetCursorPosition(2 * viewPosX, viewPosY);
@@ -289,7 +249,6 @@ END: { }
 					View[viewPosY, viewPosX] = "  ";
 				}
             }
-		END: { }
 		}
 
         public static void Clear(IAnimatable animatable)
@@ -300,9 +259,6 @@ END: { }
             {
                 for (int j = 0; j < animatable.Width; j++)
                 {
-					if (animatable.ContentsSize <= i * animatable.Width + j)
-						goto END;
-
 					viewPosX = animatable.X + j;
 					viewPosY = animatable.Y + i;
 					Console.SetCursorPosition(2 * viewPosX, viewPosY);
@@ -311,7 +267,6 @@ END: { }
 					View[viewPosY, viewPosX] = "  ";
 				}
             }
-		END: { }
 		}
 
 		public static void ClearAll()

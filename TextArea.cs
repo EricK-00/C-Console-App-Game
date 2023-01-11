@@ -12,7 +12,7 @@ namespace CSharpConsoleAppGame
     {
         public string TextString { get; private set; }
 
-        public TextArea(int x_, int y_, int width_, int height_, string text_) : base(x_, y_, width_, height_)
+        public TextArea(int x_, int y_, string text_) : base(x_, y_, text_)
         {
             TextString = text_;
             SetContents();
@@ -20,7 +20,7 @@ namespace CSharpConsoleAppGame
             Screen.Render(this);
         }
 
-		public TextArea(int x_, int y_, int width_, int height_, string text_, int delayTerm) : base(x_, y_, width_, height_)
+		public TextArea(int x_, int y_, string text_, int delayTerm) : base(x_, y_, text_)
 		{
 			TextString = text_;
 			SetContents();
@@ -30,19 +30,11 @@ namespace CSharpConsoleAppGame
 
 		private void SetContents()
         {
-            int strIndex = 0;
-            for (int i = 0; i < Height; i++)
+            ContentsSize = Width = TextString.Length;
+            for (int i = 0; i < Width; i++)
             {
-                for (int j = 0; j < Width; j++)
-                {
-                    if (strIndex >= TextString.Length)
-                        goto END;
-
-                    Contents[i, j] = TextString[strIndex].ToString();
-                    ++strIndex;
-                }
+                Contents[0, i] = TextString[i].ToString();
             }
-END: { ContentsSize = strIndex; }
         }
 
         public void Rewrite(string newText)

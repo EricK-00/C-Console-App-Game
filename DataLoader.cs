@@ -25,10 +25,10 @@ namespace CSharpConsoleAppGame
 			CharacterData.Initialize(new List<Character>
 			{
 				//+75, +20
-				new Character(0, "default", Type.없음, Type.없음, new CharacterStats(1,1,1,1,1,1), new Skill[1]{new Skill(0)}),
-				new Character(1, "리자몽", Type.불꽃, Type.비행, new CharacterStats(100,100,100,100,100,100), new Skill[4]{new Skill(1), new Skill(2), new Skill(3), new Skill(4)}),
-				new Character(2, "이상해꽃", Type.풀, Type.독, new CharacterStats(75,75,125,75,100,125), new Skill[4]{new Skill(4), new Skill(5), new Skill(7), new Skill(6)}),
-				new Character(3, "거북왕", Type.물, Type.없음, new CharacterStats(111,99,88,77,66,55), new Skill[4]{new Skill(1), new Skill(4), new Skill(6), new Skill(7)}),
+				new Character(0, "default", Type.없음, Type.없음, new CharacterStats(1,1,1,1,1,1), new Skill[1]{new Skill(0) }),
+				new Character(1, "리자몽", Type.불꽃, Type.비행, new CharacterStats(100,100,100,100,100,100), new Skill[4]{new Skill(1), new Skill(2), new Skill(3), new Skill(4) }),
+				new Character(2, "이상해꽃", Type.풀, Type.독, new CharacterStats(75,75,125,75,100,125), new Skill[4]{new Skill(4), new Skill(5), new Skill(7), new Skill(6) }),
+				new Character(3, "거북왕", Type.물, Type.없음, new CharacterStats(111,99,88,77,66,55), new Skill[4]{new Skill(1), new Skill(4), new Skill(6), new Skill(7) }),
 			});
 		}
 	}

@@ -8,7 +8,6 @@ namespace CSharpConsoleAppGame
 {
 	class CharacterData
 	{
-        public const int BATTLE_CHARACTER_COUNT = 3;
         private static List<Character> characterList;
 
 		public static void Initialize(List<Character> characters)

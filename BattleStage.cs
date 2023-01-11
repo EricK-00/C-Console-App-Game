@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CSharpConsoleAppGame
 {
-    internal class Battle
+    internal class BattleStage
     {
         //캐릭터 내보내기
 
@@ -42,6 +42,7 @@ namespace CSharpConsoleAppGame
         //배틀 캐릭터 [0]번과 [x]번이 교체
         //교체 전 배틀 캐릭터 턴 카운트 초기화(=1), 교체 전 배틀 캐릭터 랭크 초기화
 
+        public const int MAX_BATTLE_CHARACTER = 3;
         const int HP_TEXT_LINE = 4;
         const int CONDITION_TEXT_LINE = 13;
 
@@ -53,12 +54,12 @@ namespace CSharpConsoleAppGame
         Window allyWindow;
         Window foeWindow;
 
-		bool win = false;
+		bool winTheBattle = false;
         bool battleEnd = false;
         bool setNewAlly = true;
         bool setNewFoe = true;
 
-        public Battle()
+        public BattleStage()
         {
 			allyWindow = new Window(5, 0, 17, 15, ' ');
 			foeWindow = new Window(Screen.WIDTH - 7 - 15, 0, 17, 15, ' ');
@@ -67,75 +68,81 @@ namespace CSharpConsoleAppGame
         public bool PlayBattle(Player player, out int[] foeId)
         {
             SetUpBattleCharacter(player);
+            foeId = new int[MAX_BATTLE_CHARACTER] { foeCharacters[0].Id, foeCharacters[1].Id, foeCharacters[2].Id };
 
-			while (!battleEnd)
+            while (!battleEnd)
             {
-				++battleTurn;
+                ++battleTurn;
 
-				if (setNewFoe)
+                if (setNewFoe)
                 {
                     FoeThrowBall();
-					setNewFoe = false;
+                    setNewFoe = false;
                 }
                 if (setNewAlly)
                 {
                     ThrowBall();
-					setNewAlly = false;
-				}
+                    setNewAlly = false;
+                }
 
                 allyCharacters[0].AddTurnCount();
                 foeCharacters[0].AddTurnCount();
 
                 int mySkillIndex = SelectAction();
                 int foeSkillIndex = FoeSelectAction();
+                SelectableUI.HideKeyGuide();
 
-                (InBattleCharacter firstAttacker, InBattleCharacter secondAttacker, 
-                    Window firstAWindow, Window secondAWindow,
-                    int firstSkillIndex, int secondSkillIndex) = 
-                    GetAttackerOrder(allyCharacters[0], foeCharacters[0], allyWindow, foeWindow, mySkillIndex, foeSkillIndex);
+                bool isAllyFirst = GetAttackerOrder(allyCharacters[0], foeCharacters[0]);
 
-				if (mySkillIndex == -1)
+                (InBattleCharacter firstAttacker, InBattleCharacter secondAttacker) = isAllyFirst ?
+                    (allyCharacters[0], foeCharacters[0]) : (foeCharacters[0], allyCharacters[0]);
+                (Window firstAWindow, Window secondAWindow) = isAllyFirst ? (allyWindow, foeWindow) : (foeWindow, allyWindow);
+                (int firstASkillIndex, int secondASkillIndex) = isAllyFirst ? (mySkillIndex, foeSkillIndex) : (foeSkillIndex, mySkillIndex);
+
+
+                if (mySkillIndex == -1)
                 {
                     PlayTurnAction(foeCharacters[0], allyCharacters[0], foeWindow, allyWindow, foeSkillIndex);
 
                     if (firstAttacker.BattleStats.Hp > 0)
-						PlayTurnEndAction(firstAttacker, firstAWindow);
-					if (secondAttacker.BattleStats.Hp > 0)
-						PlayTurnEndAction(secondAttacker, secondAWindow);
-				}
+                        PlayTurnEndAction(firstAttacker, firstAWindow);
+                    if (secondAttacker.BattleStats.Hp > 0)
+                        PlayTurnEndAction(secondAttacker, secondAWindow);
+                }
                 else
                 {
                     if (firstAttacker.BattleStats.Hp > 0)
-						PlayTurnAction(firstAttacker, secondAttacker, firstAWindow, secondAWindow, firstSkillIndex);
-					if (secondAttacker.BattleStats.Hp > 0)
-						PlayTurnAction(secondAttacker, firstAttacker, secondAWindow, firstAWindow, secondSkillIndex);
+                        PlayTurnAction(firstAttacker, secondAttacker, firstAWindow, secondAWindow, firstASkillIndex);
+                    if (secondAttacker.BattleStats.Hp > 0)
+                        PlayTurnAction(secondAttacker, firstAttacker, secondAWindow, firstAWindow, secondASkillIndex);
 
                     if (firstAttacker.BattleStats.Hp > 0)
                         PlayTurnEndAction(firstAttacker, firstAWindow);
-					if (secondAttacker.BattleStats.Hp > 0)
-						PlayTurnEndAction(secondAttacker, secondAWindow);
+                    if (secondAttacker.BattleStats.Hp > 0)
+                        PlayTurnEndAction(secondAttacker, secondAWindow);
                 }
 
-				if (allyCharacters[0].BattleStats.Hp <= 0)
+                if (allyCharacters[0].BattleStats.Hp <= 0)
                 {
                     if (allyCharacters[1].BattleStats.Hp <= 0 &&
                         allyCharacters[2].BattleStats.Hp <= 0)
                     {
-                        win = false;
+                        winTheBattle = false;
                         battleEnd = true;
                     }
                     else
                     {
-						Replace(new SelectableUI(), false);
-						setNewAlly = true;
+                        Replace(false);
+                        setNewAlly = true;
+                        SelectableUI.HideKeyGuide();
                     }
                 }
 
                 if (foeCharacters[0].BattleStats.Hp <= 0)
                 {
-					if (!SwapBattleOrder(ref foeCharacters[0], ref foeCharacters[1]) && !SwapBattleOrder(ref foeCharacters[0], ref foeCharacters[2]))
+                    if (!SwapBattleOrder(ref foeCharacters[0], ref foeCharacters[1]) && !SwapBattleOrder(ref foeCharacters[0], ref foeCharacters[2]))
                     {
-                        win = true;
+                        winTheBattle = true;
                         battleEnd = true;
 
                     }
@@ -145,11 +152,10 @@ namespace CSharpConsoleAppGame
                     }
                 }
             }
-            BattleResult(win, player);
+            BattleResult(winTheBattle, player);
 
-
-            foeId = new int[CharacterData.BATTLE_CHARACTER_COUNT] { foeCharacters[0].Id, foeCharacters[1].Id, foeCharacters[2].Id }; 
-            return win;
+            Animation.FadeView();
+            return winTheBattle;
         }
 
         private void BattleResult(bool win, Player player)
@@ -169,11 +175,11 @@ namespace CSharpConsoleAppGame
 
         private void SetUpBattleCharacter(Player player)
         {
-			allyCharacters = new InBattleCharacter[CharacterData.BATTLE_CHARACTER_COUNT];
-            Character[] foeArray = new Character[CharacterData.BATTLE_CHARACTER_COUNT];
-            foeCharacters = new InBattleCharacter[CharacterData.BATTLE_CHARACTER_COUNT];
+			allyCharacters = new InBattleCharacter[MAX_BATTLE_CHARACTER];
+            Character[] foeArray = new Character[MAX_BATTLE_CHARACTER];
+            foeCharacters = new InBattleCharacter[MAX_BATTLE_CHARACTER];
 
-            for (int i = 0; i < CharacterData.BATTLE_CHARACTER_COUNT; i++)
+            for (int i = 0; i < MAX_BATTLE_CHARACTER; i++)
             {
                 allyCharacters[i] = new InBattleCharacter(player.Characters[i], player.Characters[i].DefaultName);
                 foeArray[i] = CharacterData.GetRandomCharacter();
@@ -257,7 +263,7 @@ namespace CSharpConsoleAppGame
                 switch (selectableUI.GetSelection())
                 {
                     case 0:
-                        mySelecion = SelectSkill(selectableUI);
+                        mySelecion = SelectSkill();
                         if (mySelecion == -1)
                         {
                             UIPreset.ClearAllScript();
@@ -271,7 +277,7 @@ namespace CSharpConsoleAppGame
                         break;
 
                     case 1:
-                        bool end = Replace(selectableUI, true);
+                        bool end = Replace(true);
                         if (!end)
                         {
                             UIPreset.ClearAllScript();
@@ -290,7 +296,7 @@ namespace CSharpConsoleAppGame
 			return mySelecion;
 		}
 
-        private int SelectSkill(SelectableUI selectableUI)
+        private int SelectSkill()
         {
             UIPreset.ClearAllScript();
 
@@ -299,11 +305,12 @@ namespace CSharpConsoleAppGame
             for (int i = 0; i < allyCharacters[0].Skills.Length; i++)
             {
                 skills.Add(
-				new Window(Screen.WIDTH / 2 - 15 + 16 * (i % 2), UIPreset.WINDOW_Y + 1 + 4 * (i / 2), 
-                15, 4, ' ', '=', new string[1] {$"{allyCharacters[0].Skills[i].Name}" }, true));
+				new Window(Screen.WIDTH / 2 - 17 + 18 * (i % 2), UIPreset.WINDOW_Y + 1 + 4 * (i / 2), 17, 4, ' ', '=', 
+                new string[2] {$"{allyCharacters[0].Skills[i].Name} {allyCharacters[0].Skills[i].SkillType} 〈{allyCharacters[0].Skills[i].Category}〉", 
+                    $"위력{allyCharacters[0].Skills[i].Power} 명중{allyCharacters[0].Skills[i].HitRate}"}, true));
 			}
 
-            selectableUI = new SelectableUI( skills, CursorMoveMode.Square, 2, 2);
+            SelectableUI selectableUI = new SelectableUI( skills, CursorMoveMode.Square, 2, 2);
 
             while (true)
             {
@@ -343,13 +350,13 @@ namespace CSharpConsoleAppGame
             }
         }
 
-        private bool Replace(SelectableUI selectableUI, bool isAlive)
+        private bool Replace(bool isAlive)
         {
 			UIPreset.ClearAllScript();
 			UIPreset.CreateScriptTextArea("내보낼 포켓몬을 선택하세요.", 1, false);
 
 			List<UI> characters = new List<UI>();
-			for (int i = 0; i < CharacterData.BATTLE_CHARACTER_COUNT; i++)
+			for (int i = 0; i < MAX_BATTLE_CHARACTER; i++)
 			{
 				characters.Add(
 				new Window(1 + 15 * i, UIPreset.WINDOW_Y + 2, 13, 7, ' ', '=', new string[] {
@@ -361,7 +368,7 @@ namespace CSharpConsoleAppGame
 				}, true));
 			}
 
-			selectableUI = new SelectableUI( characters, CursorMoveMode.Horizonal);
+			SelectableUI selectableUI = new SelectableUI( characters, CursorMoveMode.Horizonal);
 
             while (true)
             {
@@ -427,20 +434,19 @@ namespace CSharpConsoleAppGame
             return new Random().Next(0, 3 + 1);
         }
 
-        private (InBattleCharacter, InBattleCharacter, Window, Window, int, int) GetAttackerOrder(
-            InBattleCharacter character1, InBattleCharacter character2, Window window1, Window window2, int skillIndex1, int skillIndex2)
+        private bool GetAttackerOrder(InBattleCharacter character1, InBattleCharacter character2)
         {
             if (character1.BattleStats.Speed == character2.BattleStats.Speed)
             {
                 if (new Random().Next(0, 99 + 1) < 50)
-                    return (character1, character2, window1, window2, skillIndex1, skillIndex2);
+                    return true;
                 else
-                    return (character2, character1, window2, window1, skillIndex2, skillIndex1);
+                    return false;
             }
             else if (character1.BattleStats.Speed > character2.BattleStats.Speed)
-                return (character1, character2, window1, window2, skillIndex1, skillIndex2);
+                return true;
             else
-                return (character2, character1, window2, window1, skillIndex2, skillIndex1);
+                return false;
         }
 
         private bool SwapBattleOrder(ref InBattleCharacter mainCharacter, ref InBattleCharacter targetCharacter)
@@ -484,8 +490,7 @@ namespace CSharpConsoleAppGame
                 }
             }
 
-            if (attacker.Skills[skillIndex].Category != SkillCategory.변화 &&
-                (defender.BattleStats.Hp <= 0 || new Random().Next(0, 99 + 1) >= attacker.Skills[skillIndex].HitRate))
+            if (defender.BattleStats.Hp <= 0 || new Random().Next(0, 99 + 1) >= attacker.Skills[skillIndex].HitRate)
             {
                 skipAction = true;
                 UIPreset.CreateScriptTextArea($"{attacker.GetSkillMessage(skillIndex)}", 1, true);
@@ -538,11 +543,11 @@ namespace CSharpConsoleAppGame
                     switch (typeEffectiveness)
                     {
                         case (int)TypeTable.TypeEffectiveness.없음:
-                            UIPreset.CreateScriptTextArea("효과가 없었다...", 1, true);
+                            UIPreset.CreateScriptTextArea("효과가 없는 것 같다...", 1, true);
                             break;
                         case (int)TypeTable.TypeEffectiveness.별로 * (int)TypeTable.TypeEffectiveness.별로:
                         case (int)TypeTable.TypeEffectiveness.별로 * (int)TypeTable.TypeEffectiveness.보통:
-                            UIPreset.CreateScriptTextArea("효과가 별로였다.", 1, true);
+                            UIPreset.CreateScriptTextArea("효과가 별로인 것 같다...", 1, true);
                             break;
                         case (int)TypeTable.TypeEffectiveness.보통 * (int)TypeTable.TypeEffectiveness.보통:
                             //do nothing
