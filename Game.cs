@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +12,6 @@ namespace CSharpConsoleAppGame
 	{
 		bool isGameOver;
 		Player player;
-		Window scriptWindow;
 		readonly string[] battleOrderString = { "첫 번째", "두 번째", "세 번째", "네 번째", "다섯 번째", "여섯 번째", "일곱 번째", "마지막" };
 
 		public Game()
@@ -34,10 +34,13 @@ namespace CSharpConsoleAppGame
 
             ShowStartScreen();
 
-            ShowGuideUI();
-            //DebugBattle();
-            while (!isGameOver)
+			ShowGuideUI();
+			//DebugBattle();
+
+			while (!isGameOver)
 			{
+
+
                 SetCharacterOrder();
 				if (Battle(out foeIdArray) && player.WinCount < 8)
 				{
@@ -77,41 +80,18 @@ namespace CSharpConsoleAppGame
 				{"00", "00", "00", "00", "00" , "00", "00", "00", "00", "00", "00", "00" , "00", "00", "00", "00","00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00" ,"00", "00", "00", "00", "00", "00", },
 			});
 
-            int viewPosX, viewPosY;
+			Screen.RenderBitMap(titleImage, "11", "  ", "a");
 
-            for (int i = 0; i < titleImage.Height; i++)
-            {
-                for (int j = 0; j < titleImage.Width; j++)
-                {
-                    viewPosX = titleImage.X + j;
-                    viewPosY = titleImage.Y + i;
-                    Console.SetCursorPosition(2 * viewPosX, viewPosY);
-
-					if (titleImage.Contents[i, j] == "00")
-					{
-						titleImage.Contents[i, j] = "  ".PadRight(2);
-						Console.Write(titleImage.Contents[i, j]);
-					}
-					else
-					{
-                        titleImage.Contents[i, j] = "…".PadRight(2);
-                        Console.Write(titleImage.Contents[i, j]);
-					}
-
-                    Screen.View[viewPosY, viewPosX] = titleImage.Contents[i, j];
-                }
-            }
-
-            TextArea text = new TextArea(Screen.WIDTH / 2 - 9, Screen.HEIGHT - 3, "아무 키나 눌러 게임을 시작하세요.");
-            Console.ReadKey(true);
+			TextArea text = new TextArea(Screen.WIDTH / 2 - 9, Screen.HEIGHT - 3, "아무 키나 눌러 게임을 시작하세요.");
+			Console.ReadKey(true);
 			Animation.FadeView();
-        }
+		}
 
 		private void ShowGuideUI()
 		{
 			if (player.WinCount == 0)
 			{
-				scriptWindow = new Window(0, 15, 45, 10, ' ');
+				UIPreset.CreateScriptWindow();
 				UIPreset.CreateScriptTextArea("배틀팩토리에 오신 것을 환영합니다.", 1, true);
 				Console.ReadKey(true);
 				UIPreset.CreateScriptTextArea("배틀팩토리는 3마리의 포켓몬을 대여 받아 배틀을 하는 장소입니다.", 2, true);

@@ -12,6 +12,17 @@ namespace CSharpConsoleAppGame
 	    public const int WIDTH = 45;
 		public const int HEIGHT = 25;
 		public static string[,] View { get; } = new string[HEIGHT, WIDTH];
+
+		static Screen()
+		{
+			for (int i = 0; i < HEIGHT; i++)
+			{
+				for (int j = 0; j < WIDTH; j++)
+				{
+					View[i, j] = " ";
+				}
+			}
+		}
 		public static void RenderScreenOutLine()
 		{
 			new Window(0, 0, WIDTH, HEIGHT, ' ');
@@ -37,7 +48,47 @@ namespace CSharpConsoleAppGame
 			}
 		}
 
-        public static void RenderTextWithDelay(TextArea text, int delayTime)
+		public static void RenderBitMap(ImageArea image, string oneValue, string zeroValueView, string oneValueView)
+		{
+			int viewPosX, viewPosY;
+
+			for (int i = 0; i < image.Height; i++)
+			{
+				for (int j = 0; j < image.Width; j++)
+				{
+					viewPosX = image.X + j;
+					viewPosY = image.Y + i;
+					Console.SetCursorPosition(2 * viewPosX, viewPosY);
+
+					if (image.Contents[i, j] == oneValue)
+					{
+						if (Encoding.Default.GetBytes(oneValueView).Length == 1)
+						{
+							Console.Write(oneValueView.PadRight(2, ' '));
+						}
+						else
+						{
+							Console.Write(oneValueView);
+						}
+						View[viewPosY, viewPosX] = oneValueView;
+					}
+					else
+					{
+						if (Encoding.Default.GetBytes(zeroValueView).Length == 1)
+						{
+							Console.Write(zeroValueView.PadRight(2, ' '));
+						}
+						else
+						{
+							Console.Write(zeroValueView);
+						}
+						View[viewPosY, viewPosX] = zeroValueView;
+					}
+				}
+			}
+		}
+
+		public static void RenderTextWithDelay(TextArea text, int delayTime)
         {
 			int viewPosX, viewPosY;
 

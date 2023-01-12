@@ -17,6 +17,9 @@ namespace CSharpConsoleAppGame
 
 		public Type SkillType { get; }
 		public SkillCategory Category { get; }
+		public Action<InBattleCharacter, InBattleCharacter, int> Effect { get; }
+		public int EffectRate { get; }
+		public int Priority { get; }
 
 		public Skill(int id_)
 		{
@@ -26,9 +29,12 @@ namespace CSharpConsoleAppGame
 			HitRate = SkillData.GetSkill(id_).HitRate;
 			SkillType = SkillData.GetSkill(id_).SkillType;
             Category = SkillData.GetSkill(id_).Category;
+			Effect = SkillEffectData.GetEffects(Name);
+			EffectRate = SkillData.GetSkill(id_).EffectRate;
+			Priority = SkillData.GetSkill(id_).Priority;
         }
 
-		public Skill(int id_, string name_, int power_, int hitRate_, Type skillType_, SkillCategory category_)
+		public Skill(int id_, string name_, int power_, int hitRate_, Type skillType_, SkillCategory category_, int effectRate_, int priority_)
 		{
 			Id = id_;
 			Name = name_;
@@ -36,6 +42,23 @@ namespace CSharpConsoleAppGame
 			HitRate = hitRate_;
 			SkillType = skillType_;
 			Category = category_;
+			Effect = SkillEffectData.GetEffects(Name);
+			EffectRate = effectRate_;
+			Priority = priority_;
+		}
+
+		public string PowerString()
+		{
+			if (Power <= 0)
+				return "---";
+			return Power.ToString();
+		}
+
+		public string HitRateString()
+		{
+			if (HitRate <= 0 || HitRate > 100)
+				return "---";
+			return HitRate.ToString();
 		}
 	}
 }
