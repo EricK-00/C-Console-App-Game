@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using static CSharpConsoleAppGame.TypeTable;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace CSharpConsoleAppGame
 {
@@ -39,6 +37,18 @@ namespace CSharpConsoleAppGame
 
         //int HitRateRank;
         //int CriticalRateRank;
+
+        public float GetRankValue(int rank)
+        {
+            if (rank >= 0)
+            {
+                return ((float)rank + 2) / 2;
+            }
+            else
+            {
+                return 2 / ((float)Math.Abs(rank) + 2);
+            }
+        }
 
         public string GetRankString(int rank)
         {
@@ -222,20 +232,26 @@ namespace CSharpConsoleAppGame
 			switch (typeEffectiveness)
 			{
 				case (int)TypeEffectiveness.없음:
-					UIPreset.CreateScriptTextArea("효과가 없는 것 같다...", 1, true);
+					UIPreset.CreateScriptTextArea("효과가 없는 것 같다...", 2, true);
 					Console.ReadKey(true);
+					UIPreset.ClearScript(1);
+					UIPreset.ClearScript(2);
 					break;
 				case (int)TypeEffectiveness.별로 * (int)TypeEffectiveness.별로:
 				case (int)TypeEffectiveness.별로 * (int)TypeEffectiveness.보통:
-					UIPreset.CreateScriptTextArea("효과가 별로인 것 같다...", 1, true);
+					UIPreset.CreateScriptTextArea("효과가 별로인 것 같다...", 2, true);
 					Console.ReadKey(true);
+					UIPreset.ClearScript(1);
+					UIPreset.ClearScript(2);
 					break;
 				case (int)TypeEffectiveness.보통 * (int)TypeEffectiveness.보통:
                     UIPreset.ClearScript(1);
 					break;
 				default:
-					UIPreset.CreateScriptTextArea("효과가 굉장했다!", 1, true);
+					UIPreset.CreateScriptTextArea("효과가 굉장했다!", 2, true);
 					Console.ReadKey(true);
+					UIPreset.ClearScript(1);
+					UIPreset.ClearScript(2);
 					break;
 			}
 
@@ -277,7 +293,7 @@ namespace CSharpConsoleAppGame
 			}
 			else if (Status == StatusCondition.얼음)
 			{
-				if (new Random().Next(0, 10) < 1)
+				if (new Random().Next(0, 5) < 1)
 				{
 					UIPreset.CreateScriptTextArea("얼음이 풀렸다!", 1, true);
 					SetStatusCondition(StatusCondition.없음);
@@ -348,47 +364,98 @@ namespace CSharpConsoleAppGame
         {
             if (Rank.Attack >= 6)
             {
-                UIPreset.CreateScriptTextArea($"{BattleName}의 공격은 더 이상 올라가지 않는다.", 1, true);
+                UIPreset.CreateScriptTextArea($"{BattleName}의 공격은(는) 더 올라가지 않는다!", 1, true);
                 Console.ReadKey(true);
                 UIPreset.ClearScript(1);
             }
             else
             {
                 Rank = new RankSet(Rank.Attack + 1, Rank.Defense, Rank.SpAttack, Rank.SpDefense, Rank.Speed);
-				//BattleStats = new CharacterStats(BattleStats.Hp, DefaultStats.Attack * (2 + Rank.Attack) / 2, BattleStats.Defense,
-	   //             BattleStats.SpAttack, BattleStats.SpDefense, BattleStats.Speed);
-				UIPreset.CreateScriptTextArea($"{BattleName}의 공격이 올랐다.", 1, true);
+				UIPreset.CreateScriptTextArea($"{BattleName}의 공격이(가) 올라갔다.", 1, true);
                 Console.ReadKey(true);
                 UIPreset.ClearScript(1);
                 RerenderWindow();
             }
         }
 
-        public void AddSpeedRank()
+		public void AddSpAttackRank()
+		{
+			if (Rank.SpAttack >= 6)
+			{
+				UIPreset.CreateScriptTextArea($"{BattleName}의 특수공격은(는) 더 올라가지 않는다!", 1, true);
+				Console.ReadKey(true);
+				UIPreset.ClearScript(1);
+			}
+			else
+			{
+				Rank = new RankSet(Rank.Attack, Rank.Defense, Rank.SpAttack + 1, Rank.SpDefense, Rank.Speed);
+				UIPreset.CreateScriptTextArea($"{BattleName}의 특수공격(이)가 올라갔다.", 1, true);
+				Console.ReadKey(true);
+				UIPreset.ClearScript(1);
+				RerenderWindow();
+			}
+		}
+
+		public void AddSpDefenseRank()
+		{
+			if (Rank.SpDefense >= 6)
+			{
+				UIPreset.CreateScriptTextArea($"{BattleName}의 특수방어은(는) 더 올라가지 않는다!", 1, true);
+				Console.ReadKey(true);
+				UIPreset.ClearScript(1);
+			}
+			else
+			{
+				Rank = new RankSet(Rank.Attack, Rank.Defense, Rank.SpAttack, Rank.SpDefense + 1, Rank.Speed);
+				UIPreset.CreateScriptTextArea($"{BattleName}의 특수방어(이)가 올라갔다.", 1, true);
+				Console.ReadKey(true);
+				UIPreset.ClearScript(1);
+				RerenderWindow();
+			}
+		}
+
+		public void AddSpeedRank()
         {
             if (Rank.Speed >= 6)
             {
-                UIPreset.CreateScriptTextArea($"{BattleName}의 스피드는 더 이상 올라가지 않는다.", 1, true);
+                UIPreset.CreateScriptTextArea($"{BattleName}의 스피드은(는) 더 올라가지 않는다!", 1, true);
                 Console.ReadKey(true);
                 UIPreset.ClearScript(1);
             }
             else
             {
                 Rank = new RankSet(Rank.Attack, Rank.Defense, Rank.SpAttack, Rank.SpDefense, Rank.Speed + 1);
-				//BattleStats = new CharacterStats(BattleStats.Hp, BattleStats.Attack, BattleStats.Defense,
-	   //             BattleStats.SpAttack, BattleStats.SpDefense, DefaultStats.Speed * (2 + Rank.Speed) / 2);
-				UIPreset.CreateScriptTextArea($"{BattleName}의 스피드가 올랐다.", 1, true);
-                Console.ReadKey(true);
+				UIPreset.CreateScriptTextArea($"{BattleName}의 스피드(이)가 올라갔다.", 1, true);
+				Console.ReadKey(true);
                 UIPreset.ClearScript(1);
 				RerenderWindow();
 			}
         }
 
+		public void ReduceSpDefenseRank()
+		{
+			if (Rank.SpDefense <= -6)
+			{
+				UIPreset.CreateScriptTextArea($"{BattleName}의 특수방어은(는) 더 내려가지 않는다!", 1, true);
+				Console.ReadKey(true);
+				UIPreset.ClearScript(1);
+			}
+			else
+			{
+				Rank = new RankSet(Rank.Attack, Rank.Defense, Rank.SpAttack, Rank.SpDefense - 1, Rank.Speed);
+				UIPreset.CreateScriptTextArea($"{BattleName}의 특수방어(이)가 내려갔다.", 1, true);
+				Console.ReadKey(true);
+				UIPreset.ClearScript(1);
+				RerenderWindow();
+			}
+		}
+
 		public void Flinch()
         {
             IsFlinch = true;
         }
-        public void DrainHp(int givenDamage)
+
+        public void DrainHp(string foeName, int givenDamage)
         {
             int gainHp = givenDamage / 2;
             if (gainHp <= 0)
@@ -401,7 +468,7 @@ namespace CSharpConsoleAppGame
 
             Animation.BlinkWithColor(viewWindow, 3, ConsoleColor.Green, 100);
             RerenderWindow();
-            UIPreset.CreateScriptTextArea($"{BattleName}은(는) 체력을 회복했다.", 1, true);
+            UIPreset.CreateScriptTextArea($"{foeName}(으)로부터 체력을 흡수했다!", 1, true);
             Console.ReadKey(true);
             UIPreset.ClearScript(1);
         }
@@ -411,9 +478,9 @@ namespace CSharpConsoleAppGame
             attackReduced = Status == StatusCondition.화상 ? 2 : 1;
             speedReduced = Status == StatusCondition.마비 ? 2 : 1;
 
-			BattleStats = new CharacterStats(BattleStats.Hp, DefaultStats.Attack * (Rank.Attack + 2) / 2 / attackReduced,
-				DefaultStats.Defense * (Rank.Defense + 2) / 2, DefaultStats.SpAttack * (Rank.SpAttack + 2) / 2,
-				DefaultStats.SpDefense * (Rank.SpDefense + 2) / 2, DefaultStats.Speed * (Rank.Speed + 2) / 2 / speedReduced);
+            BattleStats = new CharacterStats(BattleStats.Hp, (int)(DefaultStats.Attack * (float)Rank.GetRankValue(Rank.Attack) / attackReduced),
+                (int)(DefaultStats.Defense * (float)Rank.GetRankValue(Rank.Defense)), (int)(DefaultStats.SpAttack * (float)Rank.GetRankValue(Rank.SpAttack)),
+                (int)(DefaultStats.SpDefense * (float)Rank.GetRankValue(Rank.SpDefense)), (int)(DefaultStats.Speed * (float)Rank.GetRankValue(Rank.Speed) / speedReduced));
 
 
 			if (Owner == OwnerType.MINE)

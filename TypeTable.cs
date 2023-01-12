@@ -10,7 +10,7 @@ namespace CSharpConsoleAppGame
 	public enum Type
 	{
 		없음 = 0,
-		불,
+		불꽃,
 		물,
 		풀,
 		비행,
@@ -18,7 +18,8 @@ namespace CSharpConsoleAppGame
 		노말,
 		얼음,
 		전기,
-		드래곤
+		드래곤,
+		에스퍼
 	}
 
 	public enum TypeEffectiveness
@@ -37,19 +38,20 @@ namespace CSharpConsoleAppGame
 
 		static TypeTable()
 		{
-			table[(int)Type.불, (int)Type.없음] = (int)TypeEffectiveness.보통;
-			table[(int)Type.불, (int)Type.불] = (int)TypeEffectiveness.별로;
-			table[(int)Type.불, (int)Type.물] = (int)TypeEffectiveness.별로;
-			table[(int)Type.불, (int)Type.풀] = (int)TypeEffectiveness.굉장;
-			table[(int)Type.불, (int)Type.비행] = (int)TypeEffectiveness.보통;
-			table[(int)Type.불, (int)Type.독] = (int)TypeEffectiveness.보통;
-			table[(int)Type.불, (int)Type.노말] = (int)TypeEffectiveness.보통;
-			table[(int)Type.불, (int)Type.얼음] = (int)TypeEffectiveness.굉장;
-			table[(int)Type.불, (int)Type.전기] = (int)TypeEffectiveness.보통;
-			table[(int)Type.불, (int)Type.드래곤] = (int)TypeEffectiveness.별로;
+			table[(int)Type.불꽃, (int)Type.없음] = (int)TypeEffectiveness.보통;
+			table[(int)Type.불꽃, (int)Type.불꽃] = (int)TypeEffectiveness.별로;
+			table[(int)Type.불꽃, (int)Type.물] = (int)TypeEffectiveness.별로;
+			table[(int)Type.불꽃, (int)Type.풀] = (int)TypeEffectiveness.굉장;
+			table[(int)Type.불꽃, (int)Type.비행] = (int)TypeEffectiveness.보통;
+			table[(int)Type.불꽃, (int)Type.독] = (int)TypeEffectiveness.보통;
+			table[(int)Type.불꽃, (int)Type.노말] = (int)TypeEffectiveness.보통;
+			table[(int)Type.불꽃, (int)Type.얼음] = (int)TypeEffectiveness.굉장;
+			table[(int)Type.불꽃, (int)Type.전기] = (int)TypeEffectiveness.보통;
+			table[(int)Type.불꽃, (int)Type.드래곤] = (int)TypeEffectiveness.별로;
+			table[(int)Type.불꽃, (int)Type.에스퍼] = (int)TypeEffectiveness.보통;
 
 			table[(int)Type.물, (int)Type.없음] = (int)TypeEffectiveness.보통;
-			table[(int)Type.물, (int)Type.불] = (int)TypeEffectiveness.굉장;
+			table[(int)Type.물, (int)Type.불꽃] = (int)TypeEffectiveness.굉장;
 			table[(int)Type.물, (int)Type.물] = (int)TypeEffectiveness.별로;
 			table[(int)Type.물, (int)Type.풀] = (int)TypeEffectiveness.별로;
 			table[(int)Type.물, (int)Type.비행] = (int)TypeEffectiveness.보통;
@@ -58,9 +60,10 @@ namespace CSharpConsoleAppGame
 			table[(int)Type.물, (int)Type.얼음] = (int)TypeEffectiveness.보통;
 			table[(int)Type.물, (int)Type.전기] = (int)TypeEffectiveness.보통;
 			table[(int)Type.물, (int)Type.드래곤] = (int)TypeEffectiveness.별로;
+			table[(int)Type.물, (int)Type.에스퍼] = (int)TypeEffectiveness.보통;
 
 			table[(int)Type.풀, (int)Type.없음] = (int)TypeEffectiveness.보통;
-			table[(int)Type.풀, (int)Type.불] = (int)TypeEffectiveness.별로;
+			table[(int)Type.풀, (int)Type.불꽃] = (int)TypeEffectiveness.별로;
 			table[(int)Type.풀, (int)Type.물] = (int)TypeEffectiveness.굉장;
 			table[(int)Type.풀, (int)Type.풀] = (int)TypeEffectiveness.별로;
 			table[(int)Type.풀, (int)Type.비행] = (int)TypeEffectiveness.별로;
@@ -69,9 +72,10 @@ namespace CSharpConsoleAppGame
 			table[(int)Type.풀, (int)Type.얼음] = (int)TypeEffectiveness.보통;
 			table[(int)Type.풀, (int)Type.전기] = (int)TypeEffectiveness.보통;
 			table[(int)Type.풀, (int)Type.드래곤] = (int)TypeEffectiveness.별로;
+			table[(int)Type.풀, (int)Type.에스퍼] = (int)TypeEffectiveness.보통;
 
 			table[(int)Type.비행, (int)Type.없음] = (int)TypeEffectiveness.보통;
-			table[(int)Type.비행, (int)Type.불] = (int)TypeEffectiveness.보통;
+			table[(int)Type.비행, (int)Type.불꽃] = (int)TypeEffectiveness.보통;
 			table[(int)Type.비행, (int)Type.물] = (int)TypeEffectiveness.보통;
 			table[(int)Type.비행, (int)Type.풀] = (int)TypeEffectiveness.굉장;
 			table[(int)Type.비행, (int)Type.비행] = (int)TypeEffectiveness.보통;
@@ -80,9 +84,10 @@ namespace CSharpConsoleAppGame
 			table[(int)Type.비행, (int)Type.얼음] = (int)TypeEffectiveness.보통;
 			table[(int)Type.비행, (int)Type.전기] = (int)TypeEffectiveness.별로;
 			table[(int)Type.비행, (int)Type.드래곤] = (int)TypeEffectiveness.보통;
+			table[(int)Type.비행, (int)Type.에스퍼] = (int)TypeEffectiveness.보통;
 
 			table[(int)Type.독, (int)Type.없음] = (int)TypeEffectiveness.보통;
-			table[(int)Type.독, (int)Type.불] = (int)TypeEffectiveness.보통;
+			table[(int)Type.독, (int)Type.불꽃] = (int)TypeEffectiveness.보통;
 			table[(int)Type.독, (int)Type.물] = (int)TypeEffectiveness.보통;
 			table[(int)Type.독, (int)Type.풀] = (int)TypeEffectiveness.굉장;
 			table[(int)Type.독, (int)Type.비행] = (int)TypeEffectiveness.보통;
@@ -91,9 +96,10 @@ namespace CSharpConsoleAppGame
 			table[(int)Type.독, (int)Type.얼음] = (int)TypeEffectiveness.보통;
 			table[(int)Type.독, (int)Type.전기] = (int)TypeEffectiveness.보통;
 			table[(int)Type.독, (int)Type.드래곤] = (int)TypeEffectiveness.보통;
+			table[(int)Type.독, (int)Type.에스퍼] = (int)TypeEffectiveness.보통;
 
 			table[(int)Type.노말, (int)Type.없음] = (int)TypeEffectiveness.보통;
-			table[(int)Type.노말, (int)Type.불] = (int)TypeEffectiveness.보통;
+			table[(int)Type.노말, (int)Type.불꽃] = (int)TypeEffectiveness.보통;
 			table[(int)Type.노말, (int)Type.물] = (int)TypeEffectiveness.보통;
 			table[(int)Type.노말, (int)Type.풀] = (int)TypeEffectiveness.보통;
 			table[(int)Type.노말, (int)Type.비행] = (int)TypeEffectiveness.보통;
@@ -102,20 +108,22 @@ namespace CSharpConsoleAppGame
 			table[(int)Type.노말, (int)Type.얼음] = (int)TypeEffectiveness.보통;
 			table[(int)Type.노말, (int)Type.전기] = (int)TypeEffectiveness.보통;
 			table[(int)Type.노말, (int)Type.드래곤] = (int)TypeEffectiveness.보통;
+			table[(int)Type.노말, (int)Type.에스퍼] = (int)TypeEffectiveness.보통;
 
 			table[(int)Type.얼음, (int)Type.없음] = (int)TypeEffectiveness.보통;
-			table[(int)Type.얼음, (int)Type.불] = (int)TypeEffectiveness.별로;
+			table[(int)Type.얼음, (int)Type.불꽃] = (int)TypeEffectiveness.별로;
 			table[(int)Type.얼음, (int)Type.물] = (int)TypeEffectiveness.별로;
 			table[(int)Type.얼음, (int)Type.풀] = (int)TypeEffectiveness.굉장;
-			table[(int)Type.얼음, (int)Type.비행] = (int)TypeEffectiveness.보통;
+			table[(int)Type.얼음, (int)Type.비행] = (int)TypeEffectiveness.굉장;
 			table[(int)Type.얼음, (int)Type.독] = (int)TypeEffectiveness.보통;
 			table[(int)Type.얼음, (int)Type.노말] = (int)TypeEffectiveness.보통;
 			table[(int)Type.얼음, (int)Type.얼음] = (int)TypeEffectiveness.별로;
 			table[(int)Type.얼음, (int)Type.전기] = (int)TypeEffectiveness.보통;
 			table[(int)Type.얼음, (int)Type.드래곤] = (int)TypeEffectiveness.굉장;
+			table[(int)Type.얼음, (int)Type.에스퍼] = (int)TypeEffectiveness.보통;
 
 			table[(int)Type.전기, (int)Type.없음] = (int)TypeEffectiveness.보통;
-			table[(int)Type.전기, (int)Type.불] = (int)TypeEffectiveness.보통;
+			table[(int)Type.전기, (int)Type.불꽃] = (int)TypeEffectiveness.보통;
 			table[(int)Type.전기, (int)Type.물] = (int)TypeEffectiveness.굉장;
 			table[(int)Type.전기, (int)Type.풀] = (int)TypeEffectiveness.별로;
 			table[(int)Type.전기, (int)Type.비행] = (int)TypeEffectiveness.굉장;
@@ -124,9 +132,10 @@ namespace CSharpConsoleAppGame
 			table[(int)Type.전기, (int)Type.얼음] = (int)TypeEffectiveness.보통;
 			table[(int)Type.전기, (int)Type.전기] = (int)TypeEffectiveness.별로;
 			table[(int)Type.전기, (int)Type.드래곤] = (int)TypeEffectiveness.별로;
+			table[(int)Type.전기, (int)Type.에스퍼] = (int)TypeEffectiveness.보통;
 
 			table[(int)Type.드래곤, (int)Type.없음] = (int)TypeEffectiveness.보통;
-			table[(int)Type.드래곤, (int)Type.불] = (int)TypeEffectiveness.보통;
+			table[(int)Type.드래곤, (int)Type.불꽃] = (int)TypeEffectiveness.보통;
 			table[(int)Type.드래곤, (int)Type.물] = (int)TypeEffectiveness.보통;
 			table[(int)Type.드래곤, (int)Type.풀] = (int)TypeEffectiveness.보통;
 			table[(int)Type.드래곤, (int)Type.비행] = (int)TypeEffectiveness.보통;
@@ -135,6 +144,19 @@ namespace CSharpConsoleAppGame
 			table[(int)Type.드래곤, (int)Type.얼음] = (int)TypeEffectiveness.보통;
 			table[(int)Type.드래곤, (int)Type.전기] = (int)TypeEffectiveness.보통;
 			table[(int)Type.드래곤, (int)Type.드래곤] = (int)TypeEffectiveness.굉장;
+			table[(int)Type.드래곤, (int)Type.에스퍼] = (int)TypeEffectiveness.보통;
+
+			table[(int)Type.에스퍼, (int)Type.없음] = (int)TypeEffectiveness.보통;
+			table[(int)Type.에스퍼, (int)Type.불꽃] = (int)TypeEffectiveness.보통;
+			table[(int)Type.에스퍼, (int)Type.물] = (int)TypeEffectiveness.보통;
+			table[(int)Type.에스퍼, (int)Type.풀] = (int)TypeEffectiveness.보통;
+			table[(int)Type.에스퍼, (int)Type.비행] = (int)TypeEffectiveness.보통;
+			table[(int)Type.에스퍼, (int)Type.독] = (int)TypeEffectiveness.굉장;
+			table[(int)Type.에스퍼, (int)Type.노말] = (int)TypeEffectiveness.보통;
+			table[(int)Type.에스퍼, (int)Type.얼음] = (int)TypeEffectiveness.보통;
+			table[(int)Type.에스퍼, (int)Type.전기] = (int)TypeEffectiveness.보통;
+			table[(int)Type.에스퍼, (int)Type.드래곤] = (int)TypeEffectiveness.보통;
+			table[(int)Type.에스퍼, (int)Type.에스퍼] = (int)TypeEffectiveness.별로;
 		}
 	}
 }

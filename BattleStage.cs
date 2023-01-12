@@ -13,6 +13,8 @@ namespace CSharpConsoleAppGame
 {
     internal class BattleStage
     {
+        public static bool BATTLE_DEBUG_MODE = false;
+
         public const int MAX_BATTLE_CHARACTER = 3;
 
         int battleTurn = 0;
@@ -30,8 +32,8 @@ namespace CSharpConsoleAppGame
 
         public BattleStage()
         {
-            allyWindow = new Window(5, 0, 17, 15, ' ');
-            foeWindow = new Window(Screen.WIDTH - 7 - 15, 0, 17, 15, ' ');
+            allyWindow = new Window(5, 0, 17, 15, ' ', true);
+            foeWindow = new Window(Screen.WIDTH - 7 - 15, 0, 17, 15, ' ', true);
         }
 
         public bool PlayBattle(Player player, out int[] foeId)
@@ -90,28 +92,13 @@ namespace CSharpConsoleAppGame
                         PlayTurnEndAction(secondAttacker);
                 }
 
-                if (allyCharacters[0].BattleStats.Hp <= 0)
-                {
-                    if (allyCharacters[1].BattleStats.Hp <= 0 &&
-                        allyCharacters[2].BattleStats.Hp <= 0)
-                    {
-                        winTheBattle = false;
-                        battleEnd = true;
-                    }
-                    else
-                    {
-                        Replace(false);
-                        setNewAlly = true;
-                        SelectableUI.HideKeyGuide();
-                    }
-                }
-
                 if (foeCharacters[0].BattleStats.Hp <= 0)
                 {
                     if (!SwapBattleOrder(ref foeCharacters[0], ref foeCharacters[1]) && !SwapBattleOrder(ref foeCharacters[0], ref foeCharacters[2]))
                     {
                         winTheBattle = true;
                         battleEnd = true;
+                        break;
 
                     }
                     else
@@ -119,7 +106,25 @@ namespace CSharpConsoleAppGame
                         setNewFoe = true;
                     }
                 }
-            }
+
+				if (allyCharacters[0].BattleStats.Hp <= 0)
+				{
+					if (allyCharacters[1].BattleStats.Hp <= 0 &&
+						allyCharacters[2].BattleStats.Hp <= 0)
+					{
+						winTheBattle = false;
+						battleEnd = true;
+                        break;
+					}
+					else
+					{
+						Replace(false);
+						setNewAlly = true;
+						SelectableUI.HideKeyGuide();
+					}
+				}
+			}
+
             BattleResult(winTheBattle, player);
 
             Animation.FadeView();
@@ -192,8 +197,8 @@ namespace CSharpConsoleAppGame
 
             List<UI> fightOrReplace = new List<UI>()
             {
-                new Window(Screen.WIDTH / 2 - 13, UIPreset.WINDOW_Y + 3, 7, 4, ' ', '=', new string[1] {"싸운다"}, true),
-                new Window(Screen.WIDTH / 2 + 6, UIPreset.WINDOW_Y + 3, 8, 4, ' ', '=', new string[1] {"교체한다"}, true)
+                new Window(Screen.WIDTH / 2 - 13, UIPreset.WINDOW_Y + 3, 7, 4, ' ', '=', new string[1] {"싸운다"}, true, true),
+                new Window(Screen.WIDTH / 2 + 6, UIPreset.WINDOW_Y + 3, 8, 4, ' ', '=', new string[1] {"교체한다"}, true, true)
         };
 
             SelectableUI selectableUI = new SelectableUI(fightOrReplace, CursorMoveMode.Horizonal);
@@ -247,8 +252,8 @@ namespace CSharpConsoleAppGame
                 skills.Add(
                 new Window(Screen.WIDTH / 2 - 17 + 18 * (i % 2), UIPreset.WINDOW_Y + 1 + 4 * (i / 2), 17, 4, ' ', '=',
                 new string[2] {
-                    $"{allyCharacters[0].Skills[i].Name} {allyCharacters[0].Skills[i].SkillType} 〈{allyCharacters[0].Skills[i].Category}〉",
-                    $"위력{allyCharacters[0].Skills[i].PowerString()} 명중{allyCharacters[0].Skills[i].HitRateString()}"}, true));
+                    $"{allyCharacters[0].Skills[i].Name}「{allyCharacters[0].Skills[i].SkillType}」",
+                    $"위력{allyCharacters[0].Skills[i].PowerString()} 명중{allyCharacters[0].Skills[i].HitRateString()}〈{allyCharacters[0].Skills[i].Category}〉"}, true, true));
             }
 
             SelectableUI selectableUI = new SelectableUI(skills, CursorMoveMode.Square, 2, 2);
@@ -306,7 +311,7 @@ namespace CSharpConsoleAppGame
                     $"{allyCharacters[i].GetHpString()}",
                     $"",
                     $"{allyCharacters[i].GetStatusString()}"
-                }, true));
+                }, true, true));
             }
 
             SelectableUI selectableUI = new SelectableUI(characters, CursorMoveMode.Horizonal);
@@ -464,7 +469,7 @@ namespace CSharpConsoleAppGame
 
                     defender.Damaged(damage, typeEffectiveness, isCritical);
 
-                    if (defender.Status == StatusCondition.얼음 && skill.SkillType == Type.불 && defender.BattleStats.Hp > 0)
+                    if (defender.Status == StatusCondition.얼음 && skill.SkillType == Type.불꽃 && defender.BattleStats.Hp > 0)
                     {
                         UIPreset.CreateScriptTextArea("얼음이 풀렸다!", 1, true);
                         defender.SetStatusCondition(StatusCondition.없음);
@@ -475,7 +480,13 @@ namespace CSharpConsoleAppGame
 
                 if (attacker.BattleStats.Hp > 0)
                 {
-                    skill.Effect.Invoke(attacker, defender, skill.EffectRate);
+                    if (BATTLE_DEBUG_MODE)
+                        skill.Effect.Invoke(attacker, defender);
+                    else
+                    {
+                        if (new Random().Next(0, 100) < skill.EffectRate)
+                            skill.Effect.Invoke(attacker, defender);
+                    }
                 }
             }
         }

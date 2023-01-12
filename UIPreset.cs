@@ -18,12 +18,12 @@ namespace CSharpConsoleAppGame
 
         public static Window CreateScriptWindow()
         {
-            return new Window(WINDOW_X, WINDOW_Y, WINDOW_WIDTH, WINDOW_HEIGHT, ' ');
+            return new Window(WINDOW_X, WINDOW_Y, WINDOW_WIDTH, WINDOW_HEIGHT, ' ', true);
         }
 
         public static Window CreateScriptWindow(char paddingChar)
         {
-            return new Window(0, 15, Screen.WIDTH, 10, paddingChar);
+            return new Window(0, 15, Screen.WIDTH, 10, paddingChar, true);
         }
 
         public static TextArea CreateScriptTextArea(string text, int line, bool isDelayed)

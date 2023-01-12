@@ -25,7 +25,7 @@ namespace CSharpConsoleAppGame
 		}
 		public static void RenderScreenOutLine()
 		{
-			new Window(0, 0, WIDTH, HEIGHT, ' ');
+			new Window(0, 0, WIDTH, HEIGHT, ' ', true);
         }
 
 		public static void RenderScreenView()
