@@ -10,7 +10,7 @@ namespace CSharpConsoleAppGame
     {
         public string[,] Image { get; }
 
-		public ImageArea(int x_, int y_, string[,] image_, bool isRendered) : base(x_, y_, image_)
+        public ImageArea(int x_, int y_, string[,] image_) : base(x_, y_, image_)
         {
             Image = new string[Height, Width];
             for (int i = 0; i < Image.GetLength(0); i++)
@@ -22,11 +22,10 @@ namespace CSharpConsoleAppGame
             }
             Contents = Image;
 
-            if (isRendered)
-                Screen.Render(this);
+            Screen.Render(this);
         }
 
-		public ImageArea(int x_, int y_, int width_, int height_, char paddingChar, bool isRendered) : base(x_, y_, width_, height_)
+		public ImageArea(int x_, int y_, int width_, int height_, char paddingChar) : base(x_, y_, width_, height_)
         {
             Image = new string[Height, Width];
             for (int i = 0; i < height_; i++)
@@ -38,8 +37,7 @@ namespace CSharpConsoleAppGame
             }
             Contents = Image;
 
-            if (isRendered)
-                Screen.Render(this);
+            Screen.Render(this);
         }
 
 		protected ImageArea(int x_, int y_, int width_, int height_) : base(x_, y_, width_, height_)

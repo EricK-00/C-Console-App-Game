@@ -33,8 +33,7 @@ namespace CSharpConsoleAppGame
 
 		public static int GetCount()
 		{
-			//default 제외
-			return skillList.Count - 1;
+			return skillList.Count;
 		}
 
 		public static void GetSkillEffect(int id)

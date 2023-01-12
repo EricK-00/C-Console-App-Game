@@ -20,18 +20,29 @@ namespace CSharpConsoleAppGame
             player = new Player();
         }
 
+		private void DebugBattle()
+		{
+			player.Characters[0] = CharacterData.GetRandomCharacter();
+			player.Characters[1] = CharacterData.GetRandomCharacter();
+			player.Characters[2] = CharacterData.GetRandomCharacter();
+		}
+
 		public void PlayGame()
 		{
             Console.CursorVisible = false;
             int[] foeIdArray = new int[3];
 
             ShowStartScreen();
-			SetFirstCharacter();
+
+			ShowGuideUI();
+			//DebugBattle();
 
 			while (!isGameOver)
 			{
+
+
                 SetCharacterOrder();
-				if (PlayBattle(out foeIdArray) && player.WinCount < 8)
+				if (Battle(out foeIdArray) && player.WinCount < 8)
 				{
 					SelectFoeCharacter(foeIdArray);
 				}
@@ -67,23 +78,16 @@ namespace CSharpConsoleAppGame
 				{"00", "00", "00", "00", "00" , "00", "11", "00", "00", "00", "00", "00" , "00", "00", "00", "00","00", "00", "00", "11", "11", "11", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00" ,"00", "00", "00", "00", "00", "00", },
 				{"00", "00", "00", "00", "00" , "00", "11", "00", "00", "00", "00", "00" , "00", "00", "00", "00","00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00" ,"00", "00", "00", "00", "00", "00", },
 				{"00", "00", "00", "00", "00" , "00", "00", "00", "00", "00", "00", "00" , "00", "00", "00", "00","00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00", "00" ,"00", "00", "00", "00", "00", "00", },
-			}, false);
+			});
 
 			Screen.RenderBitMap(titleImage, "11", "  ", "a");
 
 			TextArea text = new TextArea(Screen.WIDTH / 2 - 9, Screen.HEIGHT - 3, "아무 키나 눌러 게임을 시작하세요.");
-			ConsoleKey key = Console.ReadKey(true).Key;
-			if (key == ConsoleKey.F1)
-			{
-				BattleStage.BATTLE_DEBUG_MODE = true;
-				UIPreset.CreateScriptTextArea("DebugMode", 8, false);
-				Console.ReadKey(true);
-				UIPreset.ClearScript(1);
-			}
+			Console.ReadKey(true);
 			Animation.FadeView();
 		}
 
-		private void SetFirstCharacter()
+		private void ShowGuideUI()
 		{
 			if (player.WinCount == 0)
 			{
@@ -95,33 +99,10 @@ namespace CSharpConsoleAppGame
 
 				UIPreset.ClearScript(2);
 				UIPreset.CreateScriptTextArea("3마리의 포켓몬을 대여해 드리겠습니다.", 1, true);
-				SetRandomCharacter();
 				Console.ReadKey(true);
 				UIPreset.ClearScript(1);
 			}
         }
-
-		private void SetRandomCharacter()
-		{
-			Character[] randomSet = new Character[CharacterData.GetCount()];
-			for (int i = 0; i < CharacterData.GetCount(); i++)
-			{
-				randomSet[i] = new Character(i + 1);
-			}
-
-			Character temp;
-			for (int i = 0; i < CharacterData.GetCount(); i++)
-			{
-				int randomIndex = new Random().Next(i, CharacterData.GetCount());
-
-				temp = randomSet[i];
-				randomSet[i] = randomSet[randomIndex];
-				randomSet[randomIndex] = temp;
-			}
-
-			for (int i = 0; i < BattleStage.MAX_BATTLE_CHARACTER; i++)
-				player.Characters[i] = randomSet[i];
-		}
 
 		private void SetCharacterInfoWindows(List<UI> characterWindows, Character[] characters)
 		{
@@ -140,7 +121,7 @@ namespace CSharpConsoleAppGame
                     $"",
                     $"{characters[i].Skills[0].Name} {characters[i].Skills[1].Name}",
                     $"{characters[i].Skills[2].Name} {characters[i].Skills[3].Name}",
-				}, true, true));
+				}, true));
             }
         }
 
@@ -178,8 +159,6 @@ namespace CSharpConsoleAppGame
 							else
 							{
 								UIPreset.CreateScriptTextArea("이미 선택된 포켓몬입니다.", 2, true);
-								Console.ReadKey(true);
-								UIPreset.ClearScript(2);
 							}
 							break;
 						case 1:
@@ -195,8 +174,6 @@ namespace CSharpConsoleAppGame
 							else
 							{
 								UIPreset.CreateScriptTextArea("이미 선택된 포켓몬입니다.", 2, true);
-								Console.ReadKey(true);
-								UIPreset.ClearScript(2);
 							}
 							break;
 						case 2:
@@ -212,9 +189,6 @@ namespace CSharpConsoleAppGame
 							else
 							{
 								UIPreset.CreateScriptTextArea("이미 선택된 포켓몬입니다.", 2, true);
-								Console.ReadKey(true);
-								UIPreset.ClearScript(2);
-
 							}
 							break;
 						case -1:
@@ -239,11 +213,11 @@ namespace CSharpConsoleAppGame
 
 			UIPreset.CreateScriptTextArea($"그럼 {battleOrderString[player.WinCount]} 배틀을 시작합니다.", 1, true);
 			Console.ReadKey(true);
-			//Animation.BlinkViewWithColor(4, ConsoleColor.Red, 35);
+			//Animation.BlinkViewWithColor(5, ConsoleColor.Red, 40);
 			Animation.FadeView();
 		}
 
-        private bool PlayBattle(out int[] foeId)
+        private bool Battle(out int[] foeId)
         {
 			BattleStage battleStage = new BattleStage();
 			return battleStage.PlayBattle(player, out foeId);

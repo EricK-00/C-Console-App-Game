@@ -24,7 +24,7 @@ namespace CSharpConsoleAppGame
         private char paddingChar;
         private char outlineChar = DEFAULT_OUT_LINE_CHAR;
 
-		public Window(int x_, int y_, int width_, int height_, char paddingChar_, bool isRendered) : base(x_, y_, width_, height_)
+		public Window(int x_, int y_, int width_, int height_, char paddingChar_) : base(x_, y_, width_, height_)
 		{
 			paddingChar = paddingChar_;
 			BlankAreaXMin = X + 1;
@@ -37,11 +37,10 @@ namespace CSharpConsoleAppGame
 
 			Contents = SetDefaultWindow(Width, Height, paddingChar);
 
-            if (isRendered)
-			    Screen.Render(this);
+			Screen.Render(this);
 		}
 
-		public Window(int x_, int y_, int width_, int height_, char paddingChar_, string[] windowContents, bool align, bool isRendered)
+		public Window(int x_, int y_, int width_, int height_, char paddingChar_, string[] windowContents, bool align)
 			: base(x_, y_, width_, height_)
 		{
 			paddingChar = paddingChar_;
@@ -56,11 +55,10 @@ namespace CSharpConsoleAppGame
 			SetDefaultWindow(Width, Height, paddingChar);
 			Contents = SetWindowContents(windowContents, align);
 
-			if (isRendered)
-				Screen.Render(this);
+			Screen.Render(this);
 		}
 
-		public Window(int x_, int y_, int width_, int height_, char paddingChar_, char outlineChar_, bool isRendered) : base(x_, y_, width_, height_)
+		public Window(int x_, int y_, int width_, int height_, char paddingChar_, char outlineChar_) : base(x_, y_, width_, height_)
         {
             paddingChar = paddingChar_;
             outlineChar = outlineChar_;
@@ -74,11 +72,10 @@ namespace CSharpConsoleAppGame
 
             Contents = SetDefaultWindow(Width, Height, paddingChar);
 
-			if (isRendered)
-				Screen.Render(this);
+            Screen.Render(this);
         }
 
-        public Window(int x_, int y_, int width_, int height_, char paddingChar_, char outlineChar_, string[] windowContents, bool align, bool isRendered) 
+        public Window(int x_, int y_, int width_, int height_, char paddingChar_, char outlineChar_, string[] windowContents, bool align) 
             : base(x_, y_, width_, height_)
         {
             paddingChar = paddingChar_;
@@ -94,8 +91,7 @@ namespace CSharpConsoleAppGame
             SetDefaultWindow(Width, Height, paddingChar);
             Contents = SetWindowContents(windowContents, align);
 
-			if (isRendered)
-				Screen.Render(this);
+            Screen.Render(this);
         }
 
         private string[,] SetDefaultWindow(int width, int height, char paddingChar)

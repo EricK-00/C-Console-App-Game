@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace CSharpConsoleAppGame
 {
@@ -16,7 +17,7 @@ namespace CSharpConsoleAppGame
 
 		public Type SkillType { get; }
 		public SkillCategory Category { get; }
-		public Action<InBattleCharacter, InBattleCharacter> Effect { get; }
+		public Action<InBattleCharacter, InBattleCharacter, int> Effect { get; }
 		public int EffectRate { get; }
 		public int Priority { get; }
 
@@ -49,14 +50,14 @@ namespace CSharpConsoleAppGame
 		public string PowerString()
 		{
 			if (Power <= 0)
-				return "--";
+				return "---";
 			return Power.ToString();
 		}
 
 		public string HitRateString()
 		{
 			if (HitRate <= 0 || HitRate > 100)
-				return "--";
+				return "---";
 			return HitRate.ToString();
 		}
 	}
