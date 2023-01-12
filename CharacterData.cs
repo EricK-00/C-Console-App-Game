@@ -31,7 +31,8 @@ namespace CSharpConsoleAppGame
 
 		public static int GetCount()
 		{
-			return characterList.Count;
+			//default 제외
+			return characterList.Count - 1;
 		}
 	}
 }
